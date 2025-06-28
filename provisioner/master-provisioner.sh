@@ -37,15 +37,11 @@ if ! check_task_done "01-system-init"; then
     bash "${TASK_DIR}/01-system-init.sh"; mark_task_done "01-system-init"
 fi
 
-# TASK: 02-cgroup-fix
-if ! check_task_done "02-cgroup-fix"; then
-    bash "${TASK_DIR}/02-cgroup-fix.sh"; TASK_EXIT_CODE=$?
-    if [ $TASK_EXIT_CODE -eq 10 ]; then
-        mark_task_done "02-cgroup-fix"
-        if [ "$UNATTENDED_REBOOT" = true ]; then log_warn "cgroup fix applied. Instructing systemd to reboot..."; systemctl reboot; else log_warn "cgroup fix applied. Please reboot manually."; fi
-        exit 0
-    fi
-    mark_task_done "02-cgroup-fix"
+if [ "$UNATTENDED_REBOOT" = true ]; then
+    log_warn "cgroup fix applied. Forcing immediate reboot now..."
+    /usr/sbin/reboot -f
+else
+    log_warn "cgroup fix applied. Please reboot manually ('sudo reboot')."
 fi
 
 # TASK: 03-k3s-install
@@ -55,8 +51,14 @@ fi
 
 # TASK: 03a-k3s-reboot
 if ! check_task_done "03a-k3s-reboot"; then
+    log_info "Executing Task: Forcing K3s Stability Reboot..."
     mark_task_done "03a-k3s-reboot"
-    if [ "$UNATTENDED_REBOOT" = true ]; then log_warn "K3s installed. Instructing systemd to reboot for stability..."; systemctl reboot; else log_warn "K3s installed. Please reboot manually for stability."; fi
+    if [ "$UNATTENDED_REBOOT" = true ]; then
+        log_warn "K3s installed. Forcing immediate reboot for stability..."
+        /usr/sbin/reboot -f
+    else
+        log_warn "K3s installed. Please reboot manually for stability."
+    fi
     exit 0
 fi
 
