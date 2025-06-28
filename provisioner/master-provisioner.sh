@@ -112,6 +112,28 @@ if ! check_task_done "03-k3s-install"; then
     fi
 fi
 
+# TASK: 03a-k3s-reboot
+if ! check_task_done "03a-k3s-reboot"; then
+    log_info "Executing Task: Forcing K3s Stability Reboot..."
+    bash "${TASK_DIR}/03a-k3s-reboot.sh"
+    TASK_EXIT_CODE=$?
+
+    if [ $TASK_EXIT_CODE -eq 10 ]; then
+        log_info "Reboot signal received. K3s will stabilize on next boot."
+        mark_task_done "03a-k3s-reboot"
+        if [ "$UNATTENDED_REBOOT" = true ]; then
+            log_warn "Unattended reboot enabled. Rebooting now for K3s stability..."
+            sleep 10
+            /usr/sbin/reboot
+        else
+            log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
+        fi
+        exit 0
+    else
+        log_error "K3s reboot task failed unexpectedly."; exit 1
+    fi
+fi
+
 # TASK: 04-k3s-networking
 if ! check_task_done "04-k3s-networking"; then
     log_info "Executing Task: K3s Networking Deployment..."
