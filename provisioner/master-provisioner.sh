@@ -1,7 +1,6 @@
 #!/bin/bash
 # master-provisioner.sh
 # The Hyperion Provisioning Engine
-# Creates a REBOOT_REQUIRED file instead of rebooting itself.
 
 set -e
 
@@ -13,59 +12,57 @@ TASK_DIR="${ENGINE_DIR}/provisioner/tasks"
 HOSTNAME=$(hostname)
 CONFIG_FILE="${CONFIG_DIR}/config-${HOSTNAME}.json"
 SERVICES_FILE="${ENGINE_DIR}/configs/services.json"
-REBOOT_FLAG_FILE="${STATE_DIR}/REBOOT_REQUIRED"
+UNATTENDED_REBOOT=false
 
-# --- Logging & State Functions ---
+# --- Logging & State Functions (collapsed for brevity) ---
 log_info() { echo "$(date '+%Y-%m-%d %H:%M:%S') - INFO: $1"; }
 log_error() { echo >&2 "$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $1"; }
+log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') - WARN: $1"; }
 ensure_state_dir() { if [ ! -d "$STATE_DIR" ]; then mkdir -p "$STATE_DIR"; fi; }
 check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
 mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
 
 # --- Main Engine Logic ---
 log_info "--- Hyperion Provisioning Engine Started ---"
+if [ "$1" == "-y" ]; then UNATTENDED_REBOOT=true; fi
 ensure_state_dir
-if [ ! -f "$CONFIG_FILE" ]; then log_error "Config file not found: ${CONFIG_FILE}"; exit 1; fi
-if [ ! -f "$SERVICES_FILE" ]; then log_error "Services manifest not found: ${SERVICES_FILE}"; exit 1; fi
+if [ ! -f "$CONFIG_FILE" ]; then log_error "Config not found: ${CONFIG_FILE}"; exit 1; fi
+CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
+if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
+
 log_info "Starting State Machine..."
 
 # TASK: 01-system-init
 if ! check_task_done "01-system-init"; then
-    log_info "Executing Task: System Initialization..."
-    if bash "${TASK_DIR}/01-system-init.sh"; then mark_task_done "01-system-init"; else log_error "Task 'System Initialization' failed."; exit 1; fi
+    bash "${TASK_DIR}/01-system-init.sh"; mark_task_done "01-system-init"
 fi
 
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
-    log_info "Executing Task: Raspberry Pi CGroup Check..."
     bash "${TASK_DIR}/02-cgroup-fix.sh"; TASK_EXIT_CODE=$?
-    if [ $TASK_EXIT_CODE -eq 0 ]; then
-        log_info "CGroup settings OK."; mark_task_done "02-cgroup-fix"
-    elif [ $TASK_EXIT_CODE -eq 10 ]; then
-        log_info "CGroup settings applied. Signaling for reboot."; mark_task_done "02-cgroup-fix"
-        touch "${REBOOT_FLAG_FILE}" # Set the tripwire
+    if [ $TASK_EXIT_CODE -eq 10 ]; then
+        mark_task_done "02-cgroup-fix"
+        if [ "$UNATTENDED_REBOOT" = true ]; then log_warn "cgroup fix applied. Instructing systemd to reboot..."; systemctl reboot; else log_warn "cgroup fix applied. Please reboot manually."; fi
         exit 0
-    else log_error "CGroup check task failed."; exit 1; fi
+    fi
+    mark_task_done "02-cgroup-fix"
 fi
 
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
-    log_info "Executing Task: K3s Installation...";
-    if bash "${TASK_DIR}/03-k3s-install.sh"; then mark_task_done "03-k3s-install"; else log_error "Task 'K3s Installation' failed."; exit 1; fi
+    bash "${TASK_DIR}/03-k3s-install.sh"; mark_task_done "03-k3s-install"
 fi
 
 # TASK: 03a-k3s-reboot
 if ! check_task_done "03a-k3s-reboot"; then
-    log_info "Executing Task: Signaling for K3s Stability Reboot...";
     mark_task_done "03a-k3s-reboot"
-    touch "${REBOOT_FLAG_FILE}" # Set the tripwire
+    if [ "$UNATTENDED_REBOOT" = true ]; then log_warn "K3s installed. Instructing systemd to reboot for stability..."; systemctl reboot; else log_warn "K3s installed. Please reboot manually for stability."; fi
     exit 0
 fi
 
 # TASK: 04-k3s-networking
 if ! check_task_done "04-k3s-networking"; then
-    log_info "Executing Task: K3s Networking Deployment...";
-    if bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"; then mark_task_done "04-k3s-networking"; else log_error "Task 'K3s Networking Deployment' failed."; exit 1; fi
+    bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"; mark_task_done "04-k3s-networking"
 fi
 
 log_info "--- Platform Provisioning Steps Complete ---"
