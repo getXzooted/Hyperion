@@ -27,8 +27,11 @@ if [ -d "/etc/hyperion" ]; then
 fi
 
 # 3. Install prerequisites
-echo "--> Installing prerequisites (git)..."
-apt-get update && apt-get install -y git jq
+echo "--> Installing prerequisites (git & jq)..."
+apt-get update
+# Proactively fix any interrupted dpkg runs before installing new packages
+dpkg --configure -a
+apt-get install -y --fix-broken git jq
 
 # 4. Get GitHub credentials to clone private repository
 echo "--> Please provide your GitHub credentials to clone your private config repository."
