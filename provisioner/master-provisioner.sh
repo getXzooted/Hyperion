@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# master-provisioner.sh (v1.0.0)
+# master-provisioner.sh (v1.0)
 # The Hyperion Provisioning Engine
 # Reads configuration, manages state, and calls task scripts.
 
