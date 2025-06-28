@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# master-provisioner.sh (v1.0)
+# master-provisioner.sh
 # The Hyperion Provisioning Engine
 # Reads configuration, manages state, and calls task scripts.
 
@@ -11,7 +11,6 @@ CONFIG_DIR="/etc/hyperion/config"
 ENGINE_DIR="/opt/Hyperion"
 STATE_DIR="/etc/hyperion/state"
 TASK_DIR="${ENGINE_DIR}/provisioner/tasks"
-
 HOSTNAME=$(hostname)
 CONFIG_FILE="${CONFIG_DIR}/config-${HOSTNAME}.json"
 SERVICES_FILE="${ENGINE_DIR}/configs/services.json"
@@ -60,7 +59,7 @@ fi
 # 4. Load reboot policy from config file, allowing CLI flag to override
 CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then
-    log_info "Reboot policy set to 'unattended' by config file."
+    log_info "Unattended reboot enabled by config file."
     UNATTENDED_REBOOT=true
 fi
 
@@ -82,7 +81,6 @@ if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task: Raspberry Pi CGroup Check..."
     bash "${TASK_DIR}/02-cgroup-fix.sh"
     TASK_EXIT_CODE=$?
-
     if [ $TASK_EXIT_CODE -eq 0 ]; then
         log_info "CGroup settings OK. No reboot needed."
         mark_task_done "02-cgroup-fix"
@@ -90,7 +88,7 @@ if ! check_task_done "02-cgroup-fix"; then
         log_info "CGroup settings were applied. Reboot is required."
         mark_task_done "02-cgroup-fix"
         if [ "$UNATTENDED_REBOOT" = true ]; then
-            log_warn "Instructing systemd to reboot now..."
+            log_warn "Instructing systemd to reboot now for cgroup changes..."
             systemctl reboot
         else
             log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
@@ -111,13 +109,11 @@ if ! check_task_done "03-k3s-install"; then
     fi
 fi
 
-# TASK: 03a-k3s-reboot
+# TASK: 03a-k3s-reboot (Logic is now inside the master script)
 if ! check_task_done "03a-k3s-reboot"; then
     log_info "Executing Task: Forcing K3s Stability Reboot..."
-    # We don't need a separate task script for this. The master can do it.
     log_info "K3s has been installed. A reboot is required to ensure stability."
     mark_task_done "03a-k3s-reboot"
-
     if [ "$UNATTENDED_REBOOT" = true ]; then
         log_warn "Instructing systemd to reboot now for K3s stability..."
         systemctl reboot
@@ -130,13 +126,11 @@ fi
 # TASK: 04-k3s-networking
 if ! check_task_done "04-k3s-networking"; then
     log_info "Executing Task: K3s Networking Deployment..."
-    # Pass the config file path to the task script
     if bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"; then
         mark_task_done "04-k3s-networking"
     else
         log_error "Task 'K3s Networking Deployment' failed."; exit 1
     fi
 fi
-# --- END OF NEW TASKS ---
 
 log_info "--- Platform Provisioning Steps Complete ---"
