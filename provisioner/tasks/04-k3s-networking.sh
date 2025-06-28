@@ -20,9 +20,11 @@ until kubectl get nodes >/dev/null 2>&1; do
     sleep 5
 done
 
-echo "  -> Deploying Calico CNI..."
-kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
-kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+echo "  -> Deploying Calico CNI using Server-Side Apply..."
+# Server-side apply is more robust and avoids issues with large annotations on CRDs.
+# We must specify a field-manager name, which can be our script's name.
+kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
+kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
 
 echo "  -> Waiting for nodes to be Ready (this may take a few minutes)..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
