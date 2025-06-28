@@ -102,4 +102,26 @@ if ! check_task_done "02-cgroup-fix"; then
     fi
 fi
 
-log_info "--- Initial Provisioning Steps Complete ---"
+# TASK: 03-k3s-install
+if ! check_task_done "03-k3s-install"; then
+    log_info "Executing Task: K3s Installation..."
+    if bash "${TASK_DIR}/03-k3s-install.sh"; then
+        mark_task_done "03-k3s-install"
+    else
+        log_error "Task 'K3s Installation' failed."; exit 1
+    fi
+fi
+
+# TASK: 04-k3s-networking
+if ! check_task_done "04-k3s-networking"; then
+    log_info "Executing Task: K3s Networking Deployment..."
+    # Pass the config file path to the task script
+    if bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"; then
+        mark_task_done "04-k3s-networking"
+    else
+        log_error "Task 'K3s Networking Deployment' failed."; exit 1
+    fi
+fi
+# --- END OF NEW TASKS ---
+
+log_info "--- Platform Provisioning Steps Complete ---"

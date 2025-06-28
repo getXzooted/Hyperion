@@ -1,4 +1,6 @@
 #!/bin/bash
+# Task: 02-cgroup-fix.sh
+# Fixes the cgroup
 
 set -e
 if [ ! -f /proc/device-tree/model ] || ! grep -q "Raspberry Pi" /proc/device-tree/model; then
