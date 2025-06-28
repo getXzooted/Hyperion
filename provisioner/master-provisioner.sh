@@ -92,7 +92,7 @@ if ! check_task_done "02-cgroup-fix"; then
         if [ "$UNATTENDED_REBOOT" = true ]; then
             log_warn "Unattended reboot enabled. Rebooting now in 10 seconds..."
             sleep 10
-            reboot
+            /usr/sbin/reboot
         else
             log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
         fi
