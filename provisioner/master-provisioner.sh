@@ -90,9 +90,8 @@ if ! check_task_done "02-cgroup-fix"; then
         log_info "CGroup settings were applied. Reboot is required."
         mark_task_done "02-cgroup-fix"
         if [ "$UNATTENDED_REBOOT" = true ]; then
-            log_warn "Unattended reboot enabled. Rebooting now in 10 seconds..."
-            sleep 10
-            /usr/sbin/reboot
+            log_warn "Instructing systemd to reboot now..."
+            systemctl reboot
         else
             log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
         fi
@@ -115,23 +114,17 @@ fi
 # TASK: 03a-k3s-reboot
 if ! check_task_done "03a-k3s-reboot"; then
     log_info "Executing Task: Forcing K3s Stability Reboot..."
-    bash "${TASK_DIR}/03a-k3s-reboot.sh"
-    TASK_EXIT_CODE=$?
+    # We don't need a separate task script for this. The master can do it.
+    log_info "K3s has been installed. A reboot is required to ensure stability."
+    mark_task_done "03a-k3s-reboot"
 
-    if [ $TASK_EXIT_CODE -eq 10 ]; then
-        log_info "Reboot signal received. K3s will stabilize on next boot."
-        mark_task_done "03a-k3s-reboot"
-        if [ "$UNATTENDED_REBOOT" = true ]; then
-            log_warn "Unattended reboot enabled. Rebooting now for K3s stability..."
-            sleep 10
-            /usr/sbin/reboot
-        else
-            log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
-        fi
-        exit 0
+    if [ "$UNATTENDED_REBOOT" = true ]; then
+        log_warn "Instructing systemd to reboot now for K3s stability..."
+        systemctl reboot
     else
-        log_error "K3s reboot task failed unexpectedly."; exit 1
+        log_warn "Please reboot the system manually ('sudo reboot') to continue provisioning."
     fi
+    exit 0
 fi
 
 # TASK: 04-k3s-networking
