@@ -1,13 +1,31 @@
 #!/bin/bash
-# Task: 01-system-init.sh
-# Updates the system and is resilient to interruptions.
-# Sets iptables to legacy mode, then updates the system.
+# Task: 01-system-init.sh (v1.4 - Definitive Kernel Fix)
+# Configures required kernel modules and settings for container networking,
+# then updates the system. This is the foundational setup.
 
 set -e
 
-echo "  -> Forcing iptables to legacy mode for K3s/CNI compatibility..."
-update-alternatives --set iptables /usr/sbin/iptables-legacy
-update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+echo "  -> Applying required kernel modules and sysctl settings for K3s networking..."
+
+# Ensure the br_netfilter module is loaded on boot
+cat <<EOF | tee /etc/modules-load.d/k3s.conf
+br_netfilter
+EOF
+
+# Load the module for the current session
+modprobe br_netfilter
+
+# Ensure required bridge-netfilter settings are enabled in the kernel
+cat <<EOF | tee /etc/sysctl.d/99-k3s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.bridge.bridge-nf-call-arptables = 1
+EOF
+
+# Apply the new sysctl settings for the current session
+sysctl --system
+
+echo "  -> Kernel networking settings applied."
 
 echo "  -> Checking for and fixing any interrupted package operations..."
 dpkg --configure -a
@@ -18,5 +36,4 @@ apt-get update
 echo "  -> Upgrading existing packages..."
 apt-get install --fix-broken -y
 apt-get upgrade -y
-
 echo "  -> Update and Upgrade complete."
