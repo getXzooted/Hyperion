@@ -14,17 +14,29 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# 2. Install prerequisites
+# 2. Pre-flight Cleanup (NEW SECTION)
+# This makes the script idempotent (rerunnable).
+echo "--> Performing pre-flight cleanup..."
+if [ -d "/opt/Hyperion" ]; then
+    echo "INFO: Found existing /opt/Hyperion directory. Removing."
+    rm -rf /opt/Hyperion
+fi
+if [ -d "/etc/hyperion" ]; then
+    echo "INFO: Found existing /etc/hyperion directory. Removing."
+    rm -rf /etc/hyperion
+fi
+
+# 3. Install prerequisites
 echo "--> Installing prerequisites (git)..."
 apt-get update && apt-get install -y git
 
-# 3. Get GitHub credentials to clone private repository
+# 4. Get GitHub credentials to clone private repository
 echo "--> Please provide your GitHub credentials to clone your private config repository."
 read -p "Enter your GitHub Username: " GITHUB_USER
 read -s -p "Enter your GitHub Personal Access Token (PAT): " GITHUB_PAT
 echo
 
-# 4. Clone the repositories
+# 5. Clone the repositories
 # The public engine is cloned to /opt/Hyperion
 echo "--> Cloning public Hyperion engine..."
 git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
@@ -34,7 +46,7 @@ echo "--> Cloning private Hyperion-config..."
 mkdir -p /etc/hyperion
 git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git" /etc/hyperion/config
 
-# 5. Set up the provisioning engine
+# 6. Set up the provisioning engine
 echo "--> Setting up the Hyperion provisioning service..."
 
 # We will create the master script file now, even though it's empty.
@@ -48,7 +60,7 @@ cp /opt/Hyperion/provisioner/pi-provisioner.service /etc/systemd/system/pi-provi
 # Make the master script executable
 chmod +x /usr/local/bin/master-provisioner.sh
 
-# 6. Enable and start the service
+# 7. Enable and start the service
 echo "--> Enabling and starting the service for the first time..."
 systemctl daemon-reload
 systemctl enable --now pi-provisioner.service
