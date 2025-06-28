@@ -25,9 +25,10 @@ echo "  -> Deploying Calico CNI using Server-Side Apply..."
 # We must specify a field-manager name, which can be our script's name.
 kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 echo "  -> Waiting for Calico operator to become ready..."
+echo "  -> Waiting 15 seconds for the calico-system namespace to be created..."
+sleep 15
 # Now, we wait for the operator deployment to be available. This resolves the race condition.
 kubectl wait --for=condition=available -n calico-system deployment/tigera-operator --timeout=300s
-
 echo "  -> Calico operator is ready. Applying custom resources..."
 # Now that the operator is ready, we can safely apply its custom resources.
 kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
