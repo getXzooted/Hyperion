@@ -1,0 +1,12 @@
+{
+  "hostname": "hyperion-node",
+  "domain_name": "example.com",
+  "lan_ip_reservation": "192.168.1.100",
+  "metallb_ip_range": "192.168.1.240-192.168.1.250",
+  "timezone": "Etc/UTC",
+  "access_point_ssid": "HyperionNet",
+  "access_point_password_secret_ref": "wifi-credentials",
+  "samba_share_size": "100Gi",
+  "cert_manager_email": "your-email@example.com",
+  "cert_manager_dns_provider": "cloudflare"
+}

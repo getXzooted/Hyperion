@@ -1,0 +1,32 @@
+{
+  "metadata": {
+    "name": "Hyperion Service Menu",
+    "version": "1.0",
+    "description": "Default enabled/disabled state for all available components."
+  },
+  "platform": { 
+    "cgroup_fix": true, 
+    "k3s": true, 
+    "k8s_networking": true, 
+    "ingress_controller": true 
+  },
+  "core_router": { 
+    "access_point": true, 
+    "dhcp_server": true 
+  },
+  "applications": { 
+    "pihole": true, 
+    "home_assistant": true, 
+    "samba": true, 
+    "wireguard": true 
+  },
+  "operations": { 
+    "monitoring": true, 
+    "logging": true, 
+    "security_nids": true, 
+    "security_tls": true, 
+    "security_secrets": true, 
+    "backups": true, 
+    "gitops": true 
+  }
+}
