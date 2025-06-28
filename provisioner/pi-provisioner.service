@@ -1,0 +1,17 @@
+# Hyperion/provisioner/pi-provisioner.service
+
+[Unit]
+Description=Hyperion Provisioning Service
+# This is critical: Do not start this service until the network is fully online.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# This is the master script the service will execute.
+ExecStart=/usr/local/bin/master-provisioner.sh
+RemainAfterExit=yes
+
+[Install]
+# This tells systemd to start our service during the normal boot process.
+WantedBy=multi-user.target
