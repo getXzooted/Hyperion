@@ -1,6 +1,6 @@
 #!/bin/bash
-# Task: 04-k3s-networking.sh (v1.3 - Debug Enhanced)
-# Deploys CNI, Load Balancer, and Ingress Controller with robust waits.
+# Task: 04-k3s-networking.sh
+# Deploys CNI, Load Balancer, and Ingress with robust K3s readiness checks.
 set -e
 
 CONFIG_FILE="$1"
@@ -11,27 +11,15 @@ fi
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-echo "  -> Waiting for K3s API server to be available..."
-until kubectl get nodes >/dev/null 2>&1; do
-    echo "  -> K3s not ready yet, waiting 5 seconds..."
-    sleep 5
-done
+# --- NEW ROBUST K3S READINESS CHECK ---
+echo "  -> Waiting for K3s core components (coredns) to be ready..."
+# Waiting for the CoreDNS deployment is a reliable way to know the cluster is stable.
+kubectl wait --for=condition=available -n kube-system deployment/coredns --timeout=300s
+echo "  -> K3s core is ready."
+# --- END OF NEW CHECK ---
 
-# --- NEW DEBUG LOGIC SECTION ---
 echo "  -> Deploying Calico CNI using Server-Side Apply..."
-# We will capture all output (stdout and stderr) from the kubectl command into a variable
-APPLY_OUTPUT=$(kubectl apply --server-side --force-conflicts=true --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml 2>&1) || true
-
-# We check if the command was successful by looking for keywords in its output
-if ! echo "$APPLY_OUTPUT" | grep -q -E "created|configured|unchanged|serverside-applied"; then
-  echo "  -> ERROR: Applying tigera-operator.yaml failed. Detailed output from kubectl:"
-  echo "------------------- KUBECTL ERROR -------------------"
-  echo "$APPLY_OUTPUT"
-  echo "-----------------------------------------------------"
-  exit 1
-fi
-echo "  -> tigera-operator.yaml applied successfully."
-# --- END OF NEW DEBUG LOGIC ---
+kubectl apply --server-side --force-conflicts=true --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 
 echo "  -> Waiting for the calico-system namespace to be created..."
 TIMEOUT=120
@@ -40,7 +28,6 @@ while ! kubectl get namespace calico-system >/dev/null 2>&1; do
   if [ $SECONDS -ge $TIMEOUT ]; then
     echo "  -> ERROR: Timed out waiting for 'calico-system' namespace."; exit 1
   fi
-  echo "  -> 'calico-system' namespace not found yet. Waiting 5 more seconds..."
   sleep 5
   SECONDS=$((SECONDS + 5))
 done
