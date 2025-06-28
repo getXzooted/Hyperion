@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# bootstrap.sh
+# bootstrap.sh (v1.0.0)
 # This script prepares a fresh Raspberry Pi OS for the Hyperion provisioning engine.
 # It should be run as root.
 
@@ -28,7 +28,7 @@ fi
 
 # 3. Install prerequisites
 echo "--> Installing prerequisites (git)..."
-apt-get update && apt-get install -y git
+apt-get update && apt-get install -y git jq
 
 # 4. Get GitHub credentials to clone private repository
 echo "--> Please provide your GitHub credentials to clone your private config repository."
