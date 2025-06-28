@@ -1,6 +1,6 @@
 #!/bin/bash
 # Task: 04-k3s-networking.sh
-# Deploys CNI, Load Balancer, and Ingress with robust K3s readiness checks.
+# Deploys CNI, Load Balancer, and Ingress with all discovered race condition fixes.
 set -e
 
 CONFIG_FILE="$1"
@@ -11,15 +11,23 @@ fi
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
-# --- NEW ROBUST K3S READINESS CHECK ---
-echo "  -> Waiting for K3s core components (coredns) to be ready..."
-# Waiting for the CoreDNS deployment is a reliable way to know the cluster is stable.
-kubectl wait --for=condition=available -n kube-system deployment/coredns --timeout=300s
-echo "  -> K3s core is ready."
-# --- END OF NEW CHECK ---
+# Use a simple but effective readiness check. We just need to know the API server is up.
+echo "  -> Waiting for K3s API server to be available..."
+TIMEOUT=120
+SECONDS=0
+while ! kubectl get nodes >/dev/null 2>&1; do
+  if [ $SECONDS -ge $TIMEOUT ]; then
+    echo "  -> ERROR: Timed out waiting for K3s API server to become available."
+    exit 1
+  fi
+  echo "  -> K3s API server not ready yet. Waiting 5 more seconds..."
+  sleep 5
+  SECONDS=$((SECONDS + 5))
+done
+echo "  -> K3s API server is ready."
 
 echo "  -> Deploying Calico CNI using Server-Side Apply..."
-kubectl apply --server-side --force-conflicts=true --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
+kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 
 echo "  -> Waiting for the calico-system namespace to be created..."
 TIMEOUT=120
@@ -29,7 +37,6 @@ while ! kubectl get namespace calico-system >/dev/null 2>&1; do
     echo "  -> ERROR: Timed out waiting for 'calico-system' namespace."; exit 1
   fi
   sleep 5
-  SECONDS=$((SECONDS + 5))
 done
 echo "  -> Namespace 'calico-system' found."
 
@@ -37,7 +44,7 @@ echo "  -> Waiting for Calico operator to become ready..."
 kubectl wait --for=condition=available -n calico-system deployment/tigera-operator --timeout=300s
 
 echo "  -> Calico operator is ready. Applying custom resources..."
-kubectl apply --server-side --force-conflicts=true --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
 
 echo "  -> Deploying MetalLB (Load Balancer)..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/metallb/metallb.yaml
