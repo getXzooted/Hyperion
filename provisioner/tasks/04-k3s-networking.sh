@@ -23,7 +23,7 @@ echo "  -> Deploying Calico CNI using Server-Side Apply..."
 APPLY_OUTPUT=$(kubectl apply --server-side --force-conflicts=true --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml 2>&1) || true
 
 # We check if the command was successful by looking for keywords in its output
-if ! echo "$APPLY_OUTPUT" | grep -q -E "created|configured|unchanged"; then
+if ! echo "$APPLY_OUTPUT" | grep -q -E "created|configured|unchanged|serverside-applied"; then
   echo "  -> ERROR: Applying tigera-operator.yaml failed. Detailed output from kubectl:"
   echo "------------------- KUBECTL ERROR -------------------"
   echo "$APPLY_OUTPUT"
