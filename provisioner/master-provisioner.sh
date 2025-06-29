@@ -53,7 +53,8 @@ if ! check_task_done "02-cgroup-fix"; then
     if [ $TASK_EXIT_CODE -eq 10 ]; then
         if [ "$UNATTENDED_REBOOT" = true ]; then
             log_warn "CRITICAL: Rebooting for cgroup changes via 'systemctl reboot'..."; sleep 5
-            sudo /bin/systemctl reboot
+            #sudo /bin/systemctl reboot
+            echo b > /proc/sysrq-trigger
         else
             log_warn "CRITICAL: Please reboot manually for cgroup changes."
         fi
@@ -69,25 +70,13 @@ if ! check_task_done "03-k3s-install"; then
 
     if [ "$UNATTENDED_REBOOT" = true ]; then
         log_warn "CRITICAL: Rebooting for K3s stability via 'systemctl reboot'..."; sleep 5
-        sudo /bin/systemctl reboot
+        #sudo /bin/systemctl reboot
+        echo b > /proc/sysrq-trigger
     else
         log_warn "CRITICAL: Please reboot manually for K3s stability."
         log_warn "After rebooting, re-run this script: sudo bash /usr/local/bin/master-provisioner.sh"
     fi
     exit 1 # Stop and wait for reboot
-fi
-
-# TASK: 03a-k3s-reboot
-if ! check_task_done "03a-k3s-reboot"; then
-    log_info "Executing Task: Forcing K3s Stability Reboot..."
-    mark_task_done "03a-k3s-reboot"
-    if [ "$UNATTENDED_REBOOT" = true ]; then
-        log_warn "K3s installed. Forcing immediate reboot for stability..."
-        /usr/sbin/reboot -f
-    else
-        log_warn "K3s installed. Please reboot manually for stability."
-    fi
-    exit 0
 fi
 
 # TASK: 04-k3s-networking
