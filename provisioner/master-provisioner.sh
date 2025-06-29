@@ -47,35 +47,32 @@ fi
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
-    # We run the task and use || true to prevent the master script from exiting
-    # if the task script returns a non-zero code (like 10).
-    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true 
+    # We use '|| true' to ensure the master script doesn't exit immediately
+    # if the task script returns a non-zero code (like 10). We capture the code instead.
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true
     TASK_EXIT_CODE=$?
     mark_task_done "02-cgroup-fix"
 
-    # Now, we check the exit code. If it was 10, we print the message and exit.
+    # Now, we check the captured exit code.
     if [ $TASK_EXIT_CODE -eq 10 ]; then
         log_warn "CRITICAL: A reboot is required to apply cgroup changes."
-        log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
-        log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
-        exit 0 # Stop execution and wait for the manual reboot.
+        log_warn "Please run 'sudo reboot' now. The service will continue after reboot."
+        exit 0 # <--- The critical change: exit cleanly
     fi
 fi
-
 
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
     log_info "Executing Task 03: K3s Installation..."
-    # Run the installation script
     sudo bash "${TASK_DIR}/03-k3s-install.sh"
     mark_task_done "03-k3s-install"
 
-    # Now, stop and tell the user to reboot for stability.
+    # Always stop for a reboot after K3s install for stability.
     log_warn "CRITICAL: A reboot is required to stabilize the K3s service."
-    log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
-    log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
-    exit 0 # Stop execution and wait for the manual reboot.
+    log_warn "Please run 'sudo reboot' now. The service will continue after reboot."
+    exit 0 # <--- The critical change: exit cleanly
 fi
+
 
 
 # TASK: 04-k3s-networking
