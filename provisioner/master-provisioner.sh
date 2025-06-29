@@ -55,9 +55,10 @@ if ! check_task_done "02-cgroup-fix"; then
 
     # Now, we check the captured exit code.
     if [ $TASK_EXIT_CODE -eq 10 ]; then
-        log_warn "CRITICAL: A reboot is required to apply cgroup changes."
-        log_warn "Please run 'sudo reboot' now. The service will continue after reboot."
-        exit 0 # <--- The critical change: exit cleanly
+    log_warn "CRITICAL: A reboot is required to apply cgroup changes."
+    log_warn "Please run 'sudo reboot' now. The provisioning service has been stopped."
+    # This command tells the service to stop cleanly.
+    sudo systemctl stop pi-provisioner.service
     fi
 fi
 
@@ -69,8 +70,9 @@ if ! check_task_done "03-k3s-install"; then
 
     # Always stop for a reboot after K3s install for stability.
     log_warn "CRITICAL: A reboot is required to stabilize the K3s service."
-    log_warn "Please run 'sudo reboot' now. The service will continue after reboot."
-    exit 0 # <--- The critical change: exit cleanly
+    log_warn "Please run 'sudo reboot' now. The provisioning service has been stopped."
+    # This command tells the service to stop cleanly.
+    sudo systemctl stop pi-provisioner.service
 fi
 
 
