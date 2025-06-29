@@ -58,7 +58,7 @@ if ! check_task_done "02-cgroup-fix"; then
         log_warn "CRITICAL: A reboot is required to apply cgroup changes."
         log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
         log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
-        exit 1 # Stop execution and wait for the manual reboot.
+        exit 0 # Stop execution and wait for the manual reboot.
     fi
 fi
 
@@ -74,7 +74,7 @@ if ! check_task_done "03-k3s-install"; then
     log_warn "CRITICAL: A reboot is required to stabilize the K3s service."
     log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
     log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
-    exit 1 # Stop execution and wait for the manual reboot.
+    exit 0 # Stop execution and wait for the manual reboot.
 fi
 
 
