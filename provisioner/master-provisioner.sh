@@ -47,29 +47,36 @@ fi
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
-    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true # a || true prevents the script from exiting if the task fails
+    # We run the task and use || true to prevent the master script from exiting
+    # if the task script returns a non-zero code (like 10).
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true 
     TASK_EXIT_CODE=$?
-    mark_task_done "02-cgroup-fix" # Mark as done regardless of exit code
+    mark_task_done "02-cgroup-fix"
+
+    # Now, we check the exit code. If it was 10, we print the message and exit.
     if [ $TASK_EXIT_CODE -eq 10 ]; then
-        log_warn "CRITICAL: A reboot is required. Signaling to bootstrap script."
-        sudo touch /etc/hyperion/state/REBOOT_REQUIRED
-        exit 1 # Stop execution and signal completion
-    fi
-    if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
-        log_info "Stopping execution to allow for reboot."
-        exit 0 # Exit cleanly so the bootstrap script can take over.
+        log_warn "CRITICAL: A reboot is required to apply cgroup changes."
+        log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
+        log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
+        exit 1 # Stop execution and wait for the manual reboot.
     fi
 fi
+
 
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
     log_info "Executing Task 03: K3s Installation..."
+    # Run the installation script
     sudo bash "${TASK_DIR}/03-k3s-install.sh"
     mark_task_done "03-k3s-install"
-    log_warn "CRITICAL: K3s installed. Signaling for stability reboot."
-    sudo touch /etc/hyperion/state/REBOOT_REQUIRED
-    exit 1 # Stop execution and signal completion
+
+    # Now, stop and tell the user to reboot for stability.
+    log_warn "CRITICAL: A reboot is required to stabilize the K3s service."
+    log_warn "Please run 'sudo reboot' now, then after it comes back online, re-run this script manually:"
+    log_warn "sudo bash /usr/local/bin/master-provisioner.sh"
+    exit 1 # Stop execution and wait for the manual reboot.
 fi
+
 
 # TASK: 04-k3s-networking
 if ! check_task_done "04-k3s-networking"; then
