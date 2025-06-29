@@ -22,6 +22,9 @@ ensure_state_dir() { if [ ! -d "$STATE_DIR" ]; then mkdir -p "$STATE_DIR"; fi; }
 check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
 mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
 
+# --- Variables ---
+export NEEDS_REBOOT="false"
+
 # --- Main Engine Logic ---
 log_info "--- Hyperion Provisioning Engine Started ---"
 if [ "$1" == "-y" ]; then UNATTENDED_REBOOT=true; fi
@@ -47,39 +50,48 @@ fi
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
-    # We use '|| true' to ensure the master script doesn't exit immediately
-    # if the task script returns a non-zero code (like 10). We capture the code instead.
     sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true
     TASK_EXIT_CODE=$?
     mark_task_done "02-cgroup-fix"
-
-    # Now, we check the captured exit code.
     if [ $TASK_EXIT_CODE -eq 10 ]; then
-    log_warn "CRITICAL: A reboot is required to apply cgroup changes."
-    log_warn "Please run 'sudo reboot' now. The provisioning service has been stopped."
-    # This command tells the service to stop cleanly.
-    sudo systemctl stop pi-provisioner.service
+        log_warn "Flagging that a reboot is now required for cgroup changes."
+        NEEDS_REBOOT="true"
     fi
 fi
 
+
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
-    log_info "Executing Task 03: K3s Installation..."
-    sudo bash "${TASK_DIR}/03-k3s-install.sh"
-    mark_task_done "03-k3s-install"
-
-    # Always stop for a reboot after K3s install for stability.
-    log_warn "CRITICAL: A reboot is required to stabilize the K3s service."
-    log_warn "Please run 'sudo reboot' now. The provisioning service has been stopped."
-    # This command tells the service to stop cleanly.
-    sudo systemctl stop pi-provisioner.service
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "Executing Task 03: K3s Installation..."
+        sudo bash "${TASK_DIR}/03-k3s-install.sh"
+        mark_task_done "03-k3s-install"
+        log_warn "Flagging that a reboot is now required for K3s stability."
+        NEEDS_REBOOT="true"
+    else
+        log_warn "Skipping Task 03: A reboot is required from a previous step."
+    fi
 fi
-
-
 
 # TASK: 04-k3s-networking
 if ! check_task_done "04-k3s-networking"; then
-    bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"; mark_task_done "04-k3s-networking"
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "Executing Task 04: K3s Networking Deployment..."
+        sudo bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"
+        mark_task_done "04-k3s-networking"
+    else
+        log_warn "Skipping Task 04: A reboot is required from a previous step."
+    fi
 fi
 
-log_info "--- Platform Provisioning Steps Complete ---"
+if [ "$NEEDS_REBOOT" = "true" ]; then
+    log_warn "--------------------------------------------------------"
+    log_warn "--> ACTION REQUIRED: A reboot is needed."
+    log_warn "    Please run 'sudo reboot' now."
+    log_warn "    The provisioning service will continue automatically after reboot."
+    log_warn "--------------------------------------------------------"
+else
+    log_info "--- ALL PROVISIONING COMPLETE ---"
+    sudo systemctl disable pi-provisioner.service
+    log_info "Provisioning service has been disabled."
+fi
