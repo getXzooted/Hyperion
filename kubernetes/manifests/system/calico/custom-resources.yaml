@@ -7,6 +7,13 @@ metadata:
 spec:
   # Configures Calico networking.
   calicoNetwork:
+    tolerations:
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+      effect: "NoSchedule"
     ipPools:
     - name: default-ipv4-ippool
       blockSize: 26
