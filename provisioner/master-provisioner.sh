@@ -51,16 +51,9 @@ if ! check_task_done "02-cgroup-fix"; then
     TASK_EXIT_CODE=$?
     mark_task_done "02-cgroup-fix" # Mark as done regardless of exit code
     if [ $TASK_EXIT_CODE -eq 10 ]; then
-        if [ "$UNATTENDED_REBOOT" = true ]; then
-            log_warn "CRITICAL: Rebooting for cgroup changes..."
-            log_info "Waiting for systemd-logind to be ready..."
-            until systemctl is-active systemd-logind.service >/dev/null 2>&1; do sleep 2; done
-            sleep 5
-            sudo /bin/systemctl reboot
-        else
-            log_warn "CRITICAL: Please reboot manually for cgroup changes."
-        fi
-        exit 1
+        log_warn "CRITICAL: A reboot is required. Signaling to bootstrap script."
+        sudo touch /etc/hyperion/state/REBOOT_REQUIRED
+        exit 1 # Stop execution and signal completion
     fi
 fi
 
@@ -69,18 +62,9 @@ if ! check_task_done "03-k3s-install"; then
     log_info "Executing Task 03: K3s Installation..."
     sudo bash "${TASK_DIR}/03-k3s-install.sh"
     mark_task_done "03-k3s-install"
-
-    if [ "$UNATTENDED_REBOOT" = true ]; then
-        log_warn "CRITICAL: Rebooting for K3s stability..."
-        log_info "Waiting for systemd-logind to be ready..."
-        until systemctl is-active systemd-logind.service >/dev/null 2>&1; do sleep 2; done
-        sleep 5
-        sudo /bin/systemctl reboot
-    else
-        log_warn "CRITICAL: Please reboot manually for K3s stability."
-    fi
-    exit 1
-
+    log_warn "CRITICAL: K3s installed. Signaling for stability reboot."
+    sudo touch /etc/hyperion/state/REBOOT_REQUIRED
+    exit 1 # Stop execution and signal completion
 fi
 
 # TASK: 04-k3s-networking

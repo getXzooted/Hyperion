@@ -30,21 +30,18 @@ echo "--> Enabling and starting the service for the first time..."
 systemctl daemon-reload
 systemctl enable --now pi-provisioner.service
 
-# --- NEW: Tripwire Monitoring Loop ---
 echo "--> Monitoring initial provisioning run..."
-TIMEOUT=300 # 5 minute timeout for the first run to complete
+TIMEOUT=600 # 10 minute timeout
 while systemctl is-active --quiet pi-provisioner.service; do
   sleep 5
   TIMEOUT=$((TIMEOUT-5))
-  if [ $TIMEOUT -le 0 ]; then log_error "Timed out waiting for provisioner to finish."; exit 1; fi
+  if [ $TIMEOUT -le 0 ]; then echo "ERROR: Timed out waiting for provisioner."; exit 1; fi
 done
 echo "--> Initial run finished. Checking for reboot request..."
 
-# Check if the engine left a reboot request file
 if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
-    echo "--> Provisioner has requested a reboot to apply critical changes."
+    echo "--> Provisioner has requested a reboot. REBOOTING NOW..."
     rm -f /etc/hyperion/state/REBOOT_REQUIRED
-    echo "--> REBOOTING NOW..."
     sleep 5
     reboot
 else
