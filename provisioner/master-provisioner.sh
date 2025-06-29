@@ -44,9 +44,37 @@ else
     log_warn "cgroup fix applied. Please reboot manually ('sudo reboot')."
 fi
 
+# TASK: 02-cgroup-fix
+if ! check_task_done "02-cgroup-fix"; then
+    log_info "Executing Task 02: CGroup Fix..."
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh"
+    TASK_EXIT_CODE=$?
+    mark_task_done "02-cgroup-fix" # Mark as done regardless of exit code
+    if [ $TASK_EXIT_CODE -eq 10 ]; then
+        if [ "$UNATTENDED_REBOOT" = true ]; then
+            log_warn "CRITICAL: Rebooting for cgroup changes via 'systemctl reboot'..."; sleep 5
+            sudo /bin/systemctl reboot
+        else
+            log_warn "CRITICAL: Please reboot manually for cgroup changes."
+        fi
+        exit 1 # Stop and wait for reboot
+    fi
+fi
+
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
-    bash "${TASK_DIR}/03-k3s-install.sh"; mark_task_done "03-k3s-install"
+    log_info "Executing Task 03: K3s Installation..."
+    sudo bash "${TASK_DIR}/03-k3s-install.sh"
+    mark_task_done "03-k3s-install"
+
+    if [ "$UNATTENDED_REBOOT" = true ]; then
+        log_warn "CRITICAL: Rebooting for K3s stability via 'systemctl reboot'..."; sleep 5
+        sudo /bin/systemctl reboot
+    else
+        log_warn "CRITICAL: Please reboot manually for K3s stability."
+        log_warn "After rebooting, re-run this script: sudo bash /usr/local/bin/master-provisioner.sh"
+    fi
+    exit 1 # Stop and wait for reboot
 fi
 
 # TASK: 03a-k3s-reboot
