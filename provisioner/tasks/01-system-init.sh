@@ -37,3 +37,18 @@ echo "  -> Upgrading existing packages..."
 apt-get install --fix-broken -y
 apt-get upgrade -y
 echo "  -> Update and Upgrade complete."
+
+echo "  -> Waiting for systemd to settle after upgrade..."
+# This loop waits until the system is in a stable 'running' state.
+TIMEOUT=300 # 5 minute timeout
+SECONDS=0
+while [[ $(systemctl is-system-running) != 'running' && $(systemctl is-system-running) != 'degraded' ]]; do
+  if [ $SECONDS -ge $TIMEOUT ]; then
+    echo "  -> ERROR: Timed out waiting for systemd to settle."
+    exit 1
+  fi
+  echo "  -> System state is '$(systemctl is-system-running)'. Waiting 10 more seconds..."
+  sleep 10
+  SECONDS=$((SECONDS + 10))
+done
+echo "  -> System has settled. OS Preparation is truly complete."
