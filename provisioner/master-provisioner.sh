@@ -47,13 +47,17 @@ fi
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
-    sudo bash "${TASK_DIR}/02-cgroup-fix.sh"
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true # a || true prevents the script from exiting if the task fails
     TASK_EXIT_CODE=$?
     mark_task_done "02-cgroup-fix" # Mark as done regardless of exit code
     if [ $TASK_EXIT_CODE -eq 10 ]; then
         log_warn "CRITICAL: A reboot is required. Signaling to bootstrap script."
         sudo touch /etc/hyperion/state/REBOOT_REQUIRED
         exit 1 # Stop execution and signal completion
+    fi
+    if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
+        log_info "Stopping execution to allow for reboot."
+        exit 0 # Exit cleanly so the bootstrap script can take over.
     fi
 fi
 
