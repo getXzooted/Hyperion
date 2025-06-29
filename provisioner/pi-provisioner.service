@@ -10,6 +10,7 @@ Wants=network-online.target
 Type=oneshot
 # This is the master script the service will execute.
 ExecStart=/usr/local/bin/master-provisioner.sh
+SuccessExitStatus=1
 RemainAfterExit=yes
 
 [Install]
