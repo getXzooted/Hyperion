@@ -44,7 +44,19 @@ echo "  -> Waiting for Calico operator to become ready..."
 kubectl wait --for=condition=available -n calico-system deployment/tigera-operator --timeout=300s
 
 echo "  -> Calico operator is ready. Applying custom resources..."
-kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+TIMEOUT=120 # 2 minute timeout
+SECONDS=0
+# We will loop until the server-side apply command succeeds
+until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml >/dev/null 2>&1; do
+  if [ $SECONDS -ge $TIMEOUT ]; then
+    echo "  -> ERROR: Timed out trying to apply Calico custom resources."
+    exit 1
+  fi
+  echo "  -> API server not yet ready for Calico Installation resource. Waiting 5 more seconds..."
+  sleep 5
+  SECONDS=$((SECONDS + 5))
+done
+echo "  -> Calico Installation resource applied successfully."
 
 echo "  -> Deploying MetalLB (Load Balancer)..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/metallb/metallb.yaml
