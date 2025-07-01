@@ -7,15 +7,11 @@ set -e
 #New block to disable flannel to allow our calico to take over
 echo "  -> Creating K3s configuration file to ensure correct startup..."
 mkdir -p /etc/rancher/k3s
-sudo tee /etc/rancher/k3s/config.yaml > /dev/null <<EOF
-# This tells K3s to prepare the Flannel CNI...
-cni: "flannel"
-# ...but then immediately disable it so it never runs.
+cat <<EOF > /etc/rancher/k3s/config.yaml
+write-kubeconfig-mode: "0644"
 disable:
   - servicelb
   - traefik
-  - kube-proxy
-  - flannel
 EOF
 
 INSTALL_K3S_VERSION="v1.28.9+k3s1"
