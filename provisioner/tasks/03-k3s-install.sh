@@ -9,12 +9,9 @@ echo "  -> Creating K3s configuration file to ensure correct startup..."
 mkdir -p /etc/rancher/k3s
 cat <<EOF > /etc/rancher/k3s/config.yaml
 write-kubeconfig-mode: "0644"
-flannel-backend: "none"
-disable-network-policy: true
 disable:
   - servicelb
   - traefik
-  - kube-proxy
 EOF
 
 INSTALL_K3S_VERSION="v1.28.9+k3s1"
