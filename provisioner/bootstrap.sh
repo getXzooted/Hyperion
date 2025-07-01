@@ -55,3 +55,37 @@ echo " The system may reboot automatically as part of the process."
 echo " You can monitor progress with the command:"
 echo " journalctl -fu pi-provisioner.service"
 echo "----------------------------------------------------------------"
+
+
+#
+# Supervisor Monitoring Loop
+# This will tail the logs of the background service and handle reboots.
+#
+while true; do
+    echo
+    echo "------------------------------------------------------------------"
+    echo "--> Supervisor is monitoring the background provisioning service..."
+    echo "--> Streaming live logs now. (Press Ctrl+C to stop watching)"
+    echo "------------------------------------------------------------------"
+
+    # Show the live logs. The '|| true' prevents this from failing if the service stops.
+    sudo journalctl -fu pi-provisioner.service || true
+
+    echo
+    echo "--> Service run finished. Checking for reboot request..."
+
+    # Check if the engine left a reboot request file
+    if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
+        echo "--> ACTION: Provisioner has requested a reboot."
+        echo "    The system will automatically reboot in 10 seconds."
+        sleep 10
+        sudo rm -f /etc/hyperion/state/REBOOT_REQUIRED
+        sudo reboot
+        # Exit the bootstrap script after issuing reboot
+        exit 0
+    else
+        # If no reboot flag is found, the entire process is done.
+        echo "--> SUCCESS! All provisioning is complete."
+        break # Exit the while loop
+    fi
+done
