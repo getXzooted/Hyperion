@@ -37,15 +37,13 @@ echo "  -> Calico Operator is ready. Applying Calico custom resource configurati
 # This loop will patiently try to apply the final configuration using server-side apply.
 TIMEOUT=120
 SECONDS=0
-until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml >/dev/null 2>&1; do
-  if [ $SECONDS -ge $TIMEOUT ]; then
-    echo "  -> ERROR: Timed out trying to apply Calico custom resources."
-    exit 1
-  fi
-  echo "  -> API server not yet ready for Calico Installation resource. Waiting 5 more seconds..."
-  sleep 5
-  SECONDS=$((SECONDS + 5))
-done
+
+echo "  -> Waiting for Calico API server to be ready..."
+kubectl wait --for condition=established crd/installations.operator.tigera.io --timeout=300s
+
+echo "  -> Calico API is ready. Applying Calico custom resource configuration..."
+kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+
 echo "  -> Calico Installation resource applied successfully via server-side apply."
 
 echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
