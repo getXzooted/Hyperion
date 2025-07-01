@@ -27,26 +27,16 @@ done
 echo "  -> K3s API server is ready."
 
 echo "  -> Deploying Calico CNI using Server-Side Apply..."
-kubectl apply --server-side --field-manager=hyperion-provisioner -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
+kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 
-echo "  -> Waiting for the calico-system namespace to be created..."
+echo "  -> Waiting for Calico Operator Deployment to become available..."
+# This is the crucial fix: Wait for the deployment in the correct namespace.
+kubectl wait --for=condition=available -n tigera-operator deployment/tigera-operator --timeout=300s
+
+echo "  -> Calico Operator is ready. Applying Calico custom resource configuration..."
+# This loop will patiently try to apply the final configuration using server-side apply.
 TIMEOUT=120
 SECONDS=0
-while ! kubectl get namespace calico-system >/dev/null 2>&1; do
-  if [ $SECONDS -ge $TIMEOUT ]; then
-    echo "  -> ERROR: Timed out waiting for 'calico-system' namespace."; exit 1
-  fi
-  sleep 5
-done
-echo "  -> Namespace 'calico-system' found."
-
-echo "  -> Waiting for Calico operator to become ready..."
-kubectl wait --for=condition=available -n calico-system deployment/tigera-operator --timeout=300s
-
-echo "  -> Calico operator is ready. Applying custom resources..."
-TIMEOUT=120 # 2 minute timeout
-SECONDS=0
-# We will loop until the server-side apply command succeeds
 until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml >/dev/null 2>&1; do
   if [ $SECONDS -ge $TIMEOUT ]; then
     echo "  -> ERROR: Timed out trying to apply Calico custom resources."
@@ -56,13 +46,16 @@ until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/c
   sleep 5
   SECONDS=$((SECONDS + 5))
 done
-echo "  -> Calico Installation resource applied successfully."
+echo "  -> Calico Installation resource applied successfully via server-side apply."
 
-echo "  -> Deploying MetalLB (Load Balancer)..."
+echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
+kubectl wait --for=condition=Ready nodes --all --timeout=300s
+
+echo "  -> Deploying MetalLB..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/metallb/metallb.yaml
 kubectl wait --for=condition=available -n metallb-system deployments --all --timeout=300s
 
-echo "  -> Configuring MetalLB IP Address Pool..."
+echo "  -> Configuring MetalLB..."
 IP_RANGE=$(jq -r '.parameters.metallb_ip_range' "$CONFIG_FILE")
 cat <<EOF | kubectl apply -f -
 apiVersion: metallb.io/v1beta1
