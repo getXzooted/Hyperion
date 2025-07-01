@@ -40,25 +40,26 @@ if ! check_task_done "01-system-init"; then
     bash "${TASK_DIR}/01-system-init.sh"; mark_task_done "01-system-init"
 fi
 
-if [ "$UNATTENDED_REBOOT" = true ]; then
-    log_warn "cgroup fix applied. Forcing immediate reboot now..."
-    /usr/sbin/reboot -f
-else
-    log_warn "cgroup fix applied. Please reboot manually ('sudo reboot')."
-fi
+#if [ "$UNATTENDED_REBOOT" = true ]; then
+#    log_warn "cgroup fix applied. Forcing immediate reboot now..."
+#    /usr/sbin/reboot -f
+#else
+#    log_warn "cgroup fix applied. Please reboot manually ('sudo reboot')."
+#fi
 
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
-    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || true
-    TASK_EXIT_CODE=$?
-    mark_task_done "02-cgroup-fix"
-    if [ $TASK_EXIT_CODE -eq 10 ]; then
+    # Run the cgroup fix script and capture its exit code.
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || local TASK_EXIT_CODE=$?
+
+    # If the exit code is 10, it means a reboot is required.
+    if [ "${TASK_EXIT_CODE}" -eq 10 ]; then
         log_warn "Flagging that a reboot is now required for cgroup changes."
         NEEDS_REBOOT="true"
     fi
+    mark_task_done "02-cgroup-fix"
 fi
-
 
 # TASK: 03-k3s-install
 if ! check_task_done "03-k3s-install"; then
