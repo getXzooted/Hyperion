@@ -5,30 +5,23 @@ kind: Installation
 metadata:
   name: default
 spec:
-  # Configures Calico networking.
+  # This explicitly tells Calico to manage the K3s pod network range.
+  # This is the key fix.
   calicoNetwork:
-    tolerations:
-    - key: "node-role.kubernetes.io/control-plane"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "node-role.kubernetes.io/master"
-      operator: "Exists"
-      effect: "NoSchedule"
     ipPools:
-    - name: default-ipv4-ippool
-      blockSize: 26
-      cidr: 192.168.0.0/16
-      encapsulation: VXLANCrossSubnet
+    - blockSize: 26
+      cidr: 10.42.0.0/16
+      encapsulation: VXLANEncapsulation
       natOutgoing: Enabled
       nodeSelector: all()
 
 ---
 
 # This section configures the Calico API server.
-# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
 apiVersion: operator.tigera.io/v1
 kind: APIServer
 metadata:
   name: default
 spec: {}
+
 
