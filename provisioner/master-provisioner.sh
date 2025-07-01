@@ -51,7 +51,7 @@ fi
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
     # Run the cgroup fix script and capture its exit code.
-    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" || local TASK_EXIT_CODE=$?
+    sudo bash "${TASK_DIR}/02-cgroup-fix.sh" ||  TASK_EXIT_CODE=$?
 
     # If the exit code is 10, it means a reboot is required.
     if [ "${TASK_EXIT_CODE}" -eq 10 ]; then

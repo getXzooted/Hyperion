@@ -30,8 +30,14 @@ echo "  -> Deploying Calico CNI using Server-Side Apply..."
 kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 
 echo "  -> Waiting for Calico Operator Deployment to become available..."
-# This is the crucial fix: Wait for the deployment in the correct namespace.
 kubectl wait --for=condition=available -n tigera-operator deployment/tigera-operator --timeout=300s
+
+echo "  -> Calico Operator is ready. Applying Calico custom resource configuration..."
+until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml >/dev/null 2>&1; do
+  echo "  -> API server not yet ready for Calico Installation resource. Waiting 5 more seconds..."
+  sleep 5
+done
+echo "  -> Calico Installation resource applied successfully."
 
 echo "  -> Calico Operator is ready. Applying Calico custom resource configuration..."
 # This loop will patiently try to apply the final configuration using server-side apply.
