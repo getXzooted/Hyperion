@@ -44,11 +44,16 @@ echo "  -> Calico Installation resource applied successfully."
 echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
 
-echo "  -> Deploying MetalLB..."
+echo "  -> Deploying MetalLB Controller..."
+# We use kubectl apply on the whole metallb.yaml first to install the controller
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/metallb/metallb.yaml
-kubectl wait --for=condition=available -n metallb-system deployments --all --timeout=300s
 
-echo "  -> Configuring MetalLB..."
+echo "  -> Waiting for MetalLB controller to become ready..."
+# We must wait for the controller to be available before applying its configuration
+kubectl wait --for=condition=available -n metallb-system deployment/controller --timeout=300s
+
+echo "  -> Configuring MetalLB IPAddressPool..."
+# Now that the controller is ready, we can apply the IPAddressPool configuration
 IP_RANGE=$(jq -r '.parameters.metallb_ip_range' "$CONFIG_FILE")
 cat <<EOF | kubectl apply -f -
 apiVersion: metallb.io/v1beta1
