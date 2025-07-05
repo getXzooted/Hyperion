@@ -55,6 +55,11 @@ kubectl wait --for=condition=available -n metallb-system deployment/controller -
 echo "  -> Configuring MetalLB IPAddressPool..."
 # Now that the controller is ready, we can apply the IPAddressPool configuration
 IP_RANGE=$(jq -r '.parameters.metallb_ip_range' "$CONFIG_FILE")
+if [ -z "$IP_RANGE" ] || [ "$IP_RANGE" = "null" ]; then
+  echo "  -> ERROR: Could not find 'metallb_ip_range' in config file: $CONFIG_FILE"
+  echo "     Please ensure the key exists under 'parameters' and has a value."
+  exit 1
+fi
 cat <<EOF | kubectl apply -f -
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
