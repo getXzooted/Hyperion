@@ -32,24 +32,14 @@ kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/
 echo "  -> Waiting for Calico Operator Deployment to become available..."
 kubectl wait --for=condition=available -n tigera-operator deployment/tigera-operator --timeout=300s
 
-echo "  -> Calico Operator is ready. Applying Calico custom resource configuration..."
-until kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml >/dev/null 2>&1; do
-  echo "  -> API server not yet ready for Calico Installation resource. Waiting 5 more seconds..."
-  sleep 5
-done
-echo "  -> Calico Installation resource applied successfully."
-
-echo "  -> Calico Operator is ready. Applying Calico custom resource configuration..."
-# This loop will patiently try to apply the final configuration using server-side apply.
-TIMEOUT=120
-SECONDS=0
-echo "  -> Waiting for Calico API to be ready for Installation resource..."
+echo "  -> Calico Operator is ready. Waiting for Calico API to be established..."
+# This is the correct, intelligent wait. It waits for the API to be ready for our specific kind of resource.
 kubectl wait --for condition=established crd/installations.operator.tigera.io --timeout=300s
 
 echo "  -> Calico API is ready. Applying Calico custom resource configuration..."
+# Now that the API is ready, we can apply our configuration.
 kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
-echo "  -> Calico Installation resource applied successfully via server-side apply."
-
+echo "  -> Calico Installation resource applied successfully."
 
 echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
