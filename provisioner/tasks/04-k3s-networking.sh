@@ -38,7 +38,7 @@ kubectl wait --for condition=established crd/installations.operator.tigera.io --
 
 echo "  -> Calico API is ready. Applying Calico custom resource configuration..."
 # Now that the API is ready, we can apply our configuration.
-kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
 echo "  -> Calico Installation resource applied successfully."
 
 echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
