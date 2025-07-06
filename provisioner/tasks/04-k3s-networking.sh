@@ -82,6 +82,6 @@ echo "  -> Deploying Nginx Ingress Controller..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/nginx/deploy.yaml
 
 echo "  -> Applying Base Network Policies..."
-kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/policies/
+kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
 echo "  -> k3s Networking Tasks Complete."
