@@ -78,7 +78,7 @@ fi
 if ! check_task_done "04-k3s-networking"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "Executing Task 04: K3s Networking Deployment..."
-        sudo bash "${TASK_DIR}/04-k3s-networking.sh" "$CONFIG_FILE"
+        sudo bash "${TASK_DIR}/04-k3s-networking.sh"
         mark_task_done "04-k3s-networking"
     else
         log_warn "Skipping Task 04: A reboot is required from a previous step."

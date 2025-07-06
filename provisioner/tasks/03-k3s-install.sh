@@ -4,8 +4,9 @@
 
 set -e
 
-INSTALL_K3S_VERSION=$(jq -r '.platform.k3s' /opt/Hyperion/configs/versions.json)
 echo "  -> Installing K3s v${INSTALL_K3S_VERSION} with flags for Calico..."
+VERSIONS_FILE="/opt/Hyperion/configs/versions.json"
+INSTALL_K3S_VERSION=$(jq -r '.platform.k3s' "$VERSIONS_FILE")
 
 echo "  -> Creating K3s configuration file to ensure correct startup..."
 sudo mkdir -p /etc/rancher/k3s

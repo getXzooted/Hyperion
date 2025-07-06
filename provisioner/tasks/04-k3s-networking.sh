@@ -52,7 +52,7 @@ kubectl wait --for=condition=available -n metallb-system deployment/controller -
 
 echo "  -> Configuring MetalLB IPAddressPool..."
 # Now that the controller is ready, we can apply the IPAddressPool configuration
-IP_RANGE=$(jq -r '.kubernetes_platform.metallb_ip_range' /etc/hyperion/config/config-hyperion-router.json)
+IP_RANGE=$(jq -r '.kubernetes_platform.metallb_ip_range' "/etc/hyperion/config/config-$(hostname).json")
 if [ -z "$IP_RANGE" ] || [ "$IP_RANGE" = "null" ]; then
   echo "  -> ERROR: Could not find 'metallb_ip_range' in config file: $CONFIG_FILE"
   echo "     Please ensure the key exists under 'parameters' and has a value."
