@@ -1,0 +1,13 @@
+{
+  "metadata": {
+    "name": "Hyperion Component Versions",
+    "description": "Definitive versions for all installable components."
+  },
+  "platform": {
+    "k3s": "v1.28.9+k3s1",
+    "cert_manager": "v1.15.1"
+  },
+  "applications": {
+    "pihole": "latest"
+  }
+}
