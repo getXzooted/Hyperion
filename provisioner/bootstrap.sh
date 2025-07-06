@@ -18,6 +18,16 @@ echo
 
 echo "--> Cloning repositories..."
 git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
+# Fix ownership of the cloned repository
+#
+echo "--> Taking ownership of the /opt/Hyperion directory..."
+if [ -n "$SUDO_USER" ]; then
+    sudo chown -R "$SUDO_USER":"$SUDO_USER" /opt/Hyperion
+else
+    # Fallback for running as root directly
+    sudo chown -R "$(logname)":"$(logname)" /opt/Hyperion
+fi
+
 mkdir -p /etc/hyperion
 git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git" /etc/hyperion/config
 
