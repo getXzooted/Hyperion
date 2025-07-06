@@ -3,6 +3,7 @@
 # Prepares a fresh RPi OS and monitors the first run of the provisioner.
 
 set -e
+
 echo "--- Starting Hyperion Bootstrap ---"
 if [[ $EUID -ne 0 ]]; then echo "ERROR: This script must be run as root."; exit 1; fi
 
@@ -38,7 +39,10 @@ chmod +x /usr/local/bin/master-provisioner.sh
 
 echo "--> Enabling and starting the service for the first time..."
 systemctl daemon-reload
-systemctl enable --now pi-provisioner.service
+systemctl enable pi-provisioner.service
+
+echo "--> Starting up the Initial Provision"
+sudo bash /usr/local/bin/master-provisioner.sh
 
 echo "--> Monitoring initial provisioning run..."
 TIMEOUT=600 # 10 minute timeout
