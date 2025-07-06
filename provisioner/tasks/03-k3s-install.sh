@@ -4,7 +4,7 @@
 
 set -e
 
-INSTALL_K3S_VERSION="v1.28.9+k3s1"
+INSTALL_K3S_VERSION=$(jq -r '.platform.k3s' /opt/Hyperion/configs/versions.json)
 echo "  -> Installing K3s v${INSTALL_K3S_VERSION} with flags for Calico..."
 
 echo "  -> Creating K3s configuration file to ensure correct startup..."
