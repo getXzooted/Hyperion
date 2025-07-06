@@ -36,6 +36,12 @@ kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/manif
 echo "  -> Calico Installation resource applied successfully."
 
 echo "  -> Waiting for Calico CRDs to be established..."
+echo "  -> Deploying Cert-Manager..."
+# This ensures the cert-manager namespace and components exist before we apply policies to them.
+kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/cert-manager/cert-manager.yaml
+echo "  -> Waiting for Cert-Manager to become ready..."
+kubectl wait --for=condition=available -n cert-manager deployment/cert-manager-webhook --timeout=180s
+
 # This command waits for the NetworkPolicy definition to be ready before proceeding.
 kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
 
