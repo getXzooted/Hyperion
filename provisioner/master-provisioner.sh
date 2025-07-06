@@ -92,6 +92,7 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
     log_warn "    Please run 'sudo reboot' now."
     log_warn "    The provisioning service will continue automatically after reboot."
     log_warn "--------------------------------------------------------"
+    sudo reboot now 
     exit 0
 else
     log_info "--- ALL PROVISIONING COMPLETE ---"

@@ -37,11 +37,11 @@ cp /opt/Hyperion/provisioner/master-provisioner.sh /usr/local/bin/master-provisi
 cp /opt/Hyperion/provisioner/pi-provisioner.service /etc/systemd/system/pi-provisioner.service
 chmod +x /usr/local/bin/master-provisioner.sh
 
-echo "--> Enabling and starting the service for the first time..."
+echo "--> Enabling the service"
 systemctl daemon-reload
 systemctl enable pi-provisioner.service
 
-echo "--> Starting up the Initial Provision"
+echo "--> Running the Master-Provisioner first time"
 sudo bash /usr/local/bin/master-provisioner.sh
 
 echo "--> Monitoring initial provisioning run..."
@@ -64,42 +64,8 @@ fi
 
 echo "----------------------------------------------------------------"
 echo " SUCCESS: Bootstrap complete!"
-echo " The Hyperion provisioning service is now running in the background."
+echo " After Restart Hyperion Provisioning Service runs in background."
 echo " The system may reboot automatically as part of the process."
 echo " You can monitor progress with the command:"
 echo " journalctl -fu pi-provisioner.service"
 echo "----------------------------------------------------------------"
-
-
-#
-# Supervisor Monitoring Loop
-# This will tail the logs of the background service and handle reboots.
-#
-while true; do
-    echo
-    echo "------------------------------------------------------------------"
-    echo "--> Supervisor is monitoring the background provisioning service..."
-    echo "--> Streaming live logs now. (Press Ctrl+C to stop watching)"
-    echo "------------------------------------------------------------------"
-
-    # Show the live logs. The '|| true' prevents this from failing if the service stops.
-    sudo journalctl -fu pi-provisioner.service || true
-
-    echo
-    echo "--> Service run finished. Checking for reboot request..."
-
-    # Check if the engine left a reboot request file
-    if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
-        echo "--> ACTION: Provisioner has requested a reboot."
-        echo "    The system will automatically reboot in 10 seconds."
-        sleep 10
-        sudo rm -f /etc/hyperion/state/REBOOT_REQUIRED
-        sudo reboot
-        # Exit the bootstrap script after issuing reboot
-        exit 0
-    else
-        # If no reboot flag is found, the entire process is done.
-        echo "--> SUCCESS! All provisioning is complete."
-        break # Exit the while loop
-    fi
-done
