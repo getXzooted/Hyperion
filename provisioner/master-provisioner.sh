@@ -57,6 +57,7 @@ if ! check_task_done "02-cgroup-fix"; then
     if [ "${TASK_EXIT_CODE}" -eq 10 ]; then
         log_warn "Flagging that a reboot is now required for cgroup changes."
         NEEDS_REBOOT="true"
+        exit 0
     fi
     mark_task_done "02-cgroup-fix"
 fi
