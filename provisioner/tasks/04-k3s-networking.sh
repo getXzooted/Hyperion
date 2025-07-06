@@ -81,6 +81,9 @@ EOF
 echo "  -> Deploying Nginx Ingress Controller..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/nginx/deploy.yaml
 
+echo "  -> DIAGNOSTIC:Listing contents of the parent directory..."
+ls -la /opt/Hyperion/kubernetes/manifests/system/policies
+
 echo "  -> Applying Base Network Policies..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
