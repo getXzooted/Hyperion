@@ -1,0 +1,27 @@
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-kube-system-core
+  namespace: kube-system
+spec:
+  selector: app == 'coredns' || app == 'metrics-server'
+  types:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow pods to receive DNS queries
+    - action: Allow
+      protocol: UDP
+      destination:
+        ports: [53]
+    - action: Allow
+      protocol: TCP
+      destination:
+        ports: [53]
+  egress:
+    # Allow DNS to resolve external names
+    - action: Allow
+    # Allow metrics-server to scrape nodes
+    - action: Allow
+      destination:
+        selector: projectcalico.org/orchestrator == 'k8s'

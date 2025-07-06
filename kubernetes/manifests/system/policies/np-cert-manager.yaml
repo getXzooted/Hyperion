@@ -1,0 +1,21 @@
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-cert-manager
+  namespace: cert-manager
+spec:
+  selector: all()
+  types:
+    - Egress
+  egress:
+    # Allow access to Kubernetes API
+    - action: Allow
+      destination:
+        services:
+          name: kubernetes
+          namespace: default
+    # Allow access to the internet for ACME challenges
+    - action: Allow
+      destination:
+        ports:
+          - 443
