@@ -1,0 +1,24 @@
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-dhcp-server
+  namespace: network-services
+spec:
+  selector: app == 'dhcp-server'
+  types:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow DHCP requests from clients
+    - action: Allow
+      protocol: UDP
+      source:
+        nets: ["0.0.0.0/0"]
+      destination:
+        ports: [67]
+  egress:
+    # Allow DHCP offers to clients
+    - action: Allow
+      protocol: UDP
+      destination:
+        nets: ["0.g.0.0/0"]

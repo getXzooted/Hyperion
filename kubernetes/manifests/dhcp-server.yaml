@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dhcp-server
+  namespace: network-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dhcp-server
+  template:
+    metadata:
+      labels:
+        app: dhcp-server
+    spec:
+      containers:
+        - name: dnsmasq
+          image: "strm/dnsmasq"
+          ports:
+            - containerPort: 67
+              name: dhcp
+              protocol: UDP
+          # This section defines the DHCP range from our config file
+          # We will implement the logic to use this in a later step
+          env:
+            - name: DHCP_RANGE
+              value: "172.16.0.100,172.16.0.200,12h"
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN"] # Required for DHCP
