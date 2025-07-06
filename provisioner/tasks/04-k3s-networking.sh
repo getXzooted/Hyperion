@@ -35,6 +35,10 @@ echo "  -> Calico API is ready. Applying Calico custom resource configuration...
 kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
 echo "  -> Calico Installation resource applied successfully."
 
+echo "  -> Waiting for Calico CRDs to be established..."
+# This command waits for the NetworkPolicy definition to be ready before proceeding.
+kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
+
 echo "  -> Waiting for cluster nodes to become Ready as Calico initializes..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
 
