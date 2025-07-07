@@ -10,7 +10,11 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 echo "  ---------> Waiting for Calico NetworkPolicy CRDs to be established <---------  "
 kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
 
+echo "  ---------> Forcing API reconciliation by listing Calico CRDs <---------  "
+kubectl get crds | grep calico || true
+sleep 5
+
 echo "  ---------> Applying Base Network Policies <---------  "
 kubectl apply --server-side  -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
-echo "  ---------> Base Network Policies Complte <---------  "
+echo "  ---------> Base Network Policies Complete <---------  "
