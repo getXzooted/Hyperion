@@ -38,7 +38,7 @@ echo "  -> Calico Installation resource applied successfully."
 echo "  -> Waiting for Calico CRDs to be established..."
 echo "  -> Deploying Cert-Manager..."
 # This ensures the cert-manager namespace and components exist before we apply policies to them.
-kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/cert-manager/cert-manager.yaml
+kubectl apply --server-side --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/cert-manager/cert-manager.yaml
 
 
 
