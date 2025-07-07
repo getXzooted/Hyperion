@@ -92,7 +92,6 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
     log_warn "    The provisioning service will continue automatically after reboot."
     log_warn "--------------------------------------------------------"
     touch /etc/hyperion/state/REBOOT_REQUIRED
-    sudo reboot -r now 
 else
     log_info "--- ALL PROVISIONING COMPLETE ---"
     sudo systemctl disable pi-provisioner.service
