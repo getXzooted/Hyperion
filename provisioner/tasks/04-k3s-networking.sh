@@ -40,18 +40,10 @@ echo "  -> Deploying Cert-Manager..."
 # This ensures the cert-manager namespace and components exist before we apply policies to them.
 kubectl apply --server-side --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/cert-manager/cert-manager.yaml
 
-
-
-echo "  -> Applying Cert-Manager and capturing any errors..."
-#kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/cert-manager/cert-manager.yaml 2> /tmp/cert_manager_apply_error.log || true
-CERT_MANAGER_ERROR=$(cat /tmp/cert_manager_apply_error.log)
-echo "  -> DIAGNOSTIC: Cert-Manager apply error log: [${CERT_MANAGER_ERROR}]"
-
-
-
 echo "  -> Waiting for Cert-Manager to become ready..."
 kubectl wait --for=condition=available -n cert-manager deployment/cert-manager-webhook --timeout=180s
 
+echo "  -> Waiting for Calico NetworkPolicy CRD to be established..."
 # This command waits for the NetworkPolicy definition to be ready before proceeding.
 kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
 
@@ -96,13 +88,6 @@ EOF
 
 echo "  -> Deploying Nginx Ingress Controller..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/nginx/deploy.yaml
-
-echo "  -> DIAGNOSTIC:Listing contents of the parent directory..."
-ls -la /opt/Hyperion/kubernetes/manifests/system/
-
-echo "  -> Waiting for Calico NetworkPolicy CRD to be established..."
-# This command waits for the NetworkPolicy definition to be ready before proceeding.
-kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
 
 echo "  -> Applying Base Network Policies..."
 kubectl apply --server-side  -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
