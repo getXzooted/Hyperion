@@ -15,6 +15,6 @@ kubectl get crds | grep calico || true
 sleep 5
 
 echo "  ---------> Applying Base Network Policies <---------  "
-kubectl apply --server-side  -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
+kubectl apply --server-side --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
 echo "  ---------> Base Network Policies Complete <---------  "
