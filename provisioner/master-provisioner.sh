@@ -57,7 +57,6 @@ if ! check_task_done "02-cgroup-fix"; then
     if [ "${TASK_EXIT_CODE}" -eq 10 ]; then
         log_warn "Flagging that a reboot is now required for cgroup changes."
         NEEDS_REBOOT="true"
-        exit 0
     fi
     mark_task_done "02-cgroup-fix"
 fi
@@ -92,8 +91,8 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
     log_warn "    Please run 'sudo reboot' now."
     log_warn "    The provisioning service will continue automatically after reboot."
     log_warn "--------------------------------------------------------"
-    sudo reboot now 
-    exit 0
+    touch /etc/hyperion/state/REBOOT_REQUIRED
+    sudo reboot -r now 
 else
     log_info "--- ALL PROVISIONING COMPLETE ---"
     sudo systemctl disable pi-provisioner.service

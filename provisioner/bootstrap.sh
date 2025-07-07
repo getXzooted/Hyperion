@@ -41,16 +41,9 @@ echo "--> Enabling the service"
 systemctl daemon-reload
 systemctl enable pi-provisioner.service
 
-echo "--> Running the Master-Provisioner first time"
+echo "--> Running the master the first time"
 sudo bash /usr/local/bin/master-provisioner.sh
 
-echo "--> Monitoring initial provisioning run..."
-TIMEOUT=600 # 10 minute timeout
-while systemctl is-active --quiet pi-provisioner.service; do
-  sleep 5
-  TIMEOUT=$((TIMEOUT-5))
-  if [ $TIMEOUT -le 0 ]; then echo "ERROR: Timed out waiting for provisioner."; exit 1; fi
-done
 echo "--> Initial run finished. Checking for reboot request..."
 
 if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
