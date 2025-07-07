@@ -82,6 +82,11 @@ fi
 if [ "$NEEDS_REBOOT" = "true" ]; then
    if [ "$UNATTENDED_REBOOT" = true ]; then
       touch /etc/hyperion/state/REBOOT_REQUIRED
+      echo "--> Provisioner has requested a reboot. REBOOTING NOW..."
+      rm -f /etc/hyperion/state/REBOOT_REQUIRED
+      sleep 5
+      reboot
+      exit 0
    else
        log_warn "--------------------------------------------------------"
        log_warn "          ACTION REQUIRED: A reboot is needed.          "
