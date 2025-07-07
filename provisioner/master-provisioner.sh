@@ -40,13 +40,6 @@ if ! check_task_done "01-system-init"; then
     bash "${TASK_DIR}/01-system-init.sh"; mark_task_done "01-system-init"
 fi
 
-#if [ "$UNATTENDED_REBOOT" = true ]; then
-#    log_warn "cgroup fix applied. Forcing immediate reboot now..."
-#    /usr/sbin/reboot -f
-#else
-#    log_warn "cgroup fix applied. Please reboot manually ('sudo reboot')."
-#fi
-
 # TASK: 02-cgroup-fix
 if ! check_task_done "02-cgroup-fix"; then
     log_info "Executing Task 02: CGroup Fix..."
@@ -85,13 +78,18 @@ if ! check_task_done "04-k3s-networking"; then
     fi
 fi
 
+
 if [ "$NEEDS_REBOOT" = "true" ]; then
-    log_warn "--------------------------------------------------------"
-    log_warn "--> ACTION REQUIRED: A reboot is needed."
-    log_warn "    Please run 'sudo reboot' now."
-    log_warn "    The provisioning service will continue automatically after reboot."
-    log_warn "--------------------------------------------------------"
-    touch /etc/hyperion/state/REBOOT_REQUIRED
+   if [ "$UNATTENDED_REBOOT" = true ]; then
+      touch /etc/hyperion/state/REBOOT_REQUIRED
+   else
+       log_warn "--------------------------------------------------------"
+       log_warn "          ACTION REQUIRED: A reboot is needed.          "
+       log_warn "            Please run 'sudo reboot' now.               "
+       log_warn "            The provisioning service will               "
+       log_warn "          continue automatically after reboot.          "
+       log_warn "--------------------------------------------------------"
+   fi
 else
     log_info "--- ALL PROVISIONING COMPLETE ---"
     sudo systemctl disable pi-provisioner.service

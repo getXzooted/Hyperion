@@ -51,6 +51,7 @@ if [ -f "/etc/hyperion/state/REBOOT_REQUIRED" ]; then
     rm -f /etc/hyperion/state/REBOOT_REQUIRED
     sleep 5
     reboot
+    exit 0
 else
     echo "--> No reboot was requested. Bootstrap complete."
 fi
