@@ -78,6 +78,52 @@ if ! check_task_done "04-k3s-networking"; then
     fi
 fi
 
+if ! check_task_done "04-calico"; then
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "--> Running Task: 04-calico.sh"
+        sudo bash "${TASK_DIR}/04-calico.sh" && mark_task_done "04-calico"
+    else
+        log_warn "Skipping Task 04: A reboot is required from a previous step."
+    fi
+fi
+
+if ! check_task_done "05-metallb"; then
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "--> Running Task: 05-metallb.sh"
+        sudo bash "${TASK_DIR}/05-metallb.sh" && mark_task_done "05-metallb"
+    else
+        log_warn "Skipping Task 05: A reboot is required from a previous step."
+    fi
+fi
+
+if ! check_task_done "06-cert-manager"; then
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "--> Running Task: 06-cert-manager.sh"
+        sudo bash "${TASK_DIR}/06-cert-manager.sh" && mark_task_done "06-cert-manager"
+    else
+        log_warn "Skipping Task 06: A reboot is required from a previous step."
+    fi
+fi
+
+if ! check_task_done "07-ingress-nginx"; then
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "--> Running Task: 07-ingress-nginx.sh"
+        sudo bash "${TASK_DIR}/07-ingress-nginx.sh" && mark_task_done "07-ingress-nginx"
+    else
+        log_warn "Skipping Task 07: A reboot is required from a previous step."
+    fi
+fi
+
+if ! check_task_done "08-network-policies"; then
+    if [ "$NEEDS_REBOOT" = "false" ]; then
+        log_info "--> Running Task: 08-network-policies.sh"
+        sudo bash "${TASK_DIR}/08-network-policies.sh" && mark_task_done "08-network-policies"
+    else
+        log_warn "Skipping Task 08: A reboot is required from a previous step."
+    fi
+fi
+
+
 
 if [ "$NEEDS_REBOOT" = "true" ]; then
    if [ "$UNATTENDED_REBOOT" = true ]; then
