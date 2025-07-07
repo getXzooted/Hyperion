@@ -67,17 +67,7 @@ if ! check_task_done "03-k3s-install"; then
     fi
 fi
 
-# TASK: 04-k3s-networking
-if ! check_task_done "04-k3s-networking"; then
-    if [ "$NEEDS_REBOOT" = "false" ]; then
-        log_info "Executing Task 04: K3s Networking Deployment..."
-        sudo bash "${TASK_DIR}/04-k3s-networking.sh"
-        mark_task_done "04-k3s-networking"
-    else
-        log_warn "Skipping Task 04: A reboot is required from a previous step."
-    fi
-fi
-
+# TASK: 04-calico
 if ! check_task_done "04-calico"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "--> Running Task: 04-calico.sh"
@@ -87,6 +77,7 @@ if ! check_task_done "04-calico"; then
     fi
 fi
 
+# TASK: 05-metallb
 if ! check_task_done "05-metallb"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "--> Running Task: 05-metallb.sh"
@@ -96,6 +87,7 @@ if ! check_task_done "05-metallb"; then
     fi
 fi
 
+# TASK: 06-cert-manager
 if ! check_task_done "06-cert-manager"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "--> Running Task: 06-cert-manager.sh"
@@ -105,6 +97,7 @@ if ! check_task_done "06-cert-manager"; then
     fi
 fi
 
+# TASK: 07-ingress-nginx
 if ! check_task_done "07-ingress-nginx"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "--> Running Task: 07-ingress-nginx.sh"
@@ -114,6 +107,7 @@ if ! check_task_done "07-ingress-nginx"; then
     fi
 fi
 
+# TASK: 08-network-policies
 if ! check_task_done "08-network-policies"; then
     if [ "$NEEDS_REBOOT" = "false" ]; then
         log_info "--> Running Task: 08-network-policies.sh"
