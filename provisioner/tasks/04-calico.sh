@@ -7,6 +7,21 @@ set -e
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+echo "  ---------> Waiting for K3s API server to be available <---------  "
+TIMEOUT=120
+SECONDS=0
+while ! kubectl get nodes >/dev/null 2>&1; do
+  if [ $SECONDS -ge $TIMEOUT ]; then
+    echo "  ---------> ERROR: Timed out waiting for K3s API server to become available. <---------  "
+    exit 1
+  fi
+  echo "  ---------> K3s API server not ready yet. Waiting 5 more seconds <---------  "
+  sleep 5
+  SECONDS=$((SECONDS + 5))
+done
+
+echo "  ---------> K3s API server is ready. <---------  "
+
 echo "  ---------> Deploying Calico CNI <---------  "
 kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 

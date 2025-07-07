@@ -23,18 +23,3 @@ if [ -n "$SUDO_USER" ]; then
 fi
 
 echo "  ---------> k3s Installation Complete. <---------  "
-
-echo "  ---------> Waiting for K3s API server to be available <---------  "
-TIMEOUT=120
-SECONDS=0
-while ! kubectl get nodes >/dev/null 2>&1; do
-  if [ $SECONDS -ge $TIMEOUT ]; then
-    echo "  ---------> ERROR: Timed out waiting for K3s API server to become available. <---------  "
-    exit 1
-  fi
-  echo "  ---------> K3s API server not ready yet. Waiting 5 more seconds <---------  "
-  sleep 5
-  SECONDS=$((SECONDS + 5))
-done
-
-echo "  ---------> K3s API server is ready. <---------  "
