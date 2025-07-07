@@ -10,6 +10,9 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 echo "  ---------> Deploying Calico CNI <---------  "
 kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
 
+echo "  -> Patching Calico Operator with initialDelaySeconds..."
+kubectl patch deployment -n tigera-operator tigera-operator --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/readinessProbe/initialDelaySeconds", "value": 15}]'
+
 echo "  ---------> Waiting for Calico Operator Deployment to become available <---------  "
 kubectl wait --for=condition=available -n tigera-operator deployment/tigera-operator --timeout=300s
 
