@@ -90,6 +90,10 @@ kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/nginx/deploy.yaml
 echo "  -> DIAGNOSTIC:Listing contents of the parent directory..."
 ls -la /opt/Hyperion/kubernetes/manifests/system/
 
+echo "  -> Waiting for Calico NetworkPolicy CRD to be established..."
+# This command waits for the NetworkPolicy definition to be ready before proceeding.
+kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
+
 echo "  -> Applying Base Network Policies..."
 kubectl apply -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
