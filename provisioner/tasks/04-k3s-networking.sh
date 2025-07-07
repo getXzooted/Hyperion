@@ -105,6 +105,6 @@ echo "  -> Waiting for Calico NetworkPolicy CRD to be established..."
 kubectl wait --for condition=established crd/networkpolicies.projectcalico.org --timeout=120s
 
 echo "  -> Applying Base Network Policies..."
-kubectl apply --server-side --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
+kubectl apply --server-side  -f /opt/Hyperion/kubernetes/manifests/system/policies/*.yaml
 
 echo "  -> k3s Networking Tasks Complete."
