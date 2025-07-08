@@ -30,49 +30,70 @@ ensure_state_dir
 if [ ! -f "$CONFIG_FILE" ]; then log_error "Config not found: ${CONFIG_FILE}"; exit 1; fi
 CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
+# Read the user's desired component list from their private config
+PROVISION_LIST=$(jq -c '.provision_list[]' "$CONFIG_FILE")
+if [ -z "$PROVISION_LIST" ]; then
+    log_error "The 'provision_list' in your config file is empty or missing."
+    exit 1
+fi
 
-run_core_tasks() {
-    if [ ! -d "$CORE_TASK_DIR" ]; then return; fi
+# This is the main dependency resolution loop.
+# It will continue to loop until all components in the list are marked as .done
+while true; do
+    ALL_COMPONENTS_DONE=true
+    PROGRESS_MADE_THIS_LOOP=false
 
-    for SCRIPT_PATH in $(ls -v ${CORE_TASK_DIR}/*.sh); do
-        local SCRIPT_NAME=$(basename "$SCRIPT_PATH")
-        local STATE_NAME=${SCRIPT_NAME%.sh}
+    while IFS= read -r COMPONENT_NAME; do
+        COMPONENT_NAME=$(echo "$COMPONENT_NAME" | tr -d '"') # Clean the name from jq output
+        MANIFEST_FILE="${COMPONENTS_DIR}/${COMPONENT_NAME}/component.json"
 
-        if ! check_task_done "$STATE_NAME"; then
-            log_info "--> Running Core Task: ${SCRIPT_NAME}"
-
-            sudo bash "$SCRIPT_PATH" || local TASK_EXIT_CODE=$?
-            mark_task_done "$STATE_NAME"
-
-            # If a script exits with 10, it signals a required reboot.
-            if [[ "${TASK_EXIT_CODE}" -eq 10 ]]; then
-                UNATTENDED_REBOOT=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
-                if [ "$UNATTENDED_REBOOT" = true ]; then
-                    log_warn "--> Task '${SCRIPT_NAME}' requires reboot. Rebooting automatically in 10 seconds..."
-                    sleep 10
-                    sudo reboot
-                else
-                    log_warn "--> ACTION REQUIRED: Task '${SCRIPT_NAME}' requires a reboot. Please run 'sudo reboot' now."
-                    # We stop the service cleanly to allow manual reboot.
-                    sudo systemctl stop hyperion.service
+        if ! check_task_done "$COMPONENT_NAME"; then
+            ALL_COMPONENTS_DONE=false # At least one component is not done
+            ALL_DEPS_MET=true
+            
+            for DEP in $(jq -c '.dependencies[]' "$MANIFEST_FILE" | tr -d '"'); do
+                if ! check_task_done "$DEP"; then
+                    ALL_DEPS_MET=false
+                    break # A dependency is not met, no need to check others
                 fi
-                exit 0
+            done
+
+            if [ "$ALL_DEPS_MET" = true ]; then
+                log_info "--> Provisioning component: ${COMPONENT_NAME}"
+                INSTALL_SCRIPT=$(jq -r '.provisions.install' "$MANIFEST_FILE")
+                REBOOT_AFTER=$(jq -r '.provisions.reboot_after' "$MANIFEST_FILE")
+
+                sudo bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
+                mark_task_done "$COMPONENT_NAME"
+                PROGRESS_MADE_THIS_LOOP=true
+
+                if [[ "$REBOOT_AFTER" == "true" ]]; then
+                    UNATTENDED_REBOOT=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
+                    if [ "$UNATTENDED_REBOOT" = true ]; then
+                        log_warn "--> Task '${COMPONENT_NAME}' requires reboot. Rebooting automatically in 10 seconds..."
+                        sleep 10
+                        sudo reboot
+                    else
+                        log_warn "--> ACTION REQUIRED: Task '${COMPONENT_NAME}' requires a reboot. Please run 'sudo reboot' now."
+                        sudo systemctl stop hyperion.service # Stop cleanly
+                    fi
+                    exit 0
+                fi
             fi
         fi
-    done
-}
+    done <<< "$PROVISION_LIST"
 
-# --- Main Execution ---
-sudo mkdir -p "$STATE_DIR"
-log_info "--- Hyperion Forged Provisioning Engine Started ---"
-if [ ! -f "$CONFIG_FILE" ]; then log_error "Config file not found: ${CONFIG_FILE}"; exit 1; fi
+    # If we are finished, break the main loop
+    if [ "$ALL_COMPONENTS_DONE" = true ]; then
+        break
+    fi
 
-# 1. Run all mandatory core tasks in their specified order
-run_core_tasks
-
-# 2. Future logic for optional, GitOps-managed services will go here
-
-
+    # If we went through a whole loop without making progress, there is a dependency deadlock
+    if [ "$PROGRESS_MADE_THIS_LOOP" = false ]; then
+        log_error "Stalled due to unmet or circular dependencies. Please check your config."
+        exit 1
+    fi
+done
 
 if [ "$NEEDS_REBOOT" = "true" ]; then
    if [ "$UNATTENDED_REBOOT" = true ]; then
