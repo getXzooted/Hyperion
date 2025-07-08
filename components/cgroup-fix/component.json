@@ -1,0 +1,9 @@
+{
+  "name": "cgroup-fix",
+  "description": "Applies the cgroup memory fix required for K3s on Raspberry Pi.",
+  "dependencies": ["system-init"],
+  "provisions": {
+    "install": "cgroup-fix/install.sh",
+    "reboot_after": true
+  }
+}

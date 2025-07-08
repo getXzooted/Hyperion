@@ -1,0 +1,9 @@
+{
+  "name": "k3s",
+  "description": "Installs the K3s Kubernetes server, prepared for Calico CNI.",
+  "dependencies": ["cgroup-fix"],
+  "provisions": {
+    "install": "k3s/install.sh",
+    "reboot_after": true
+  }
+}
