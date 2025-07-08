@@ -22,6 +22,8 @@ git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git
 
 echo "  ---------> Git Connection Made Installing Custom Deployment <---------  "
 
-export GITHUB_USER
-export GITHUB_PAT
-sudo /opt/Hyperion/provisioner/hyperion-deployment.sh
+#
+#export GITHUB_USER
+#export GITHUB_PAT
+#sudo /opt/Hyperion/provisioner/hyperion-deployment.sh
+#
