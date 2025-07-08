@@ -40,4 +40,7 @@ kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/manif
 echo "  ---------> Waiting for cluster nodes to become Ready as Calico initializes <---------  "
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
 
+echo "  ---------> Waiting for cluster pods to become Ready as Calico initializes <---------  "
+kubectl wait --for=condition=Ready pods -n calico-system --all --timeout=300s
+
 echo "  ---------> Calico Installation resource applied successfully. <---------  "
