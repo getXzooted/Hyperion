@@ -24,6 +24,10 @@ check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
 mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
 
 
+# --- Pre Flight Logic ---
+cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
+
+
 # --- Main Engine Logic ---
 log_info "--- Hyperion Provisioning Engine Started ---"
 if [ "$1" == "-y" ]; then UNATTENDED_REBOOT=true; fi

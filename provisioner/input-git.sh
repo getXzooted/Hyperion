@@ -15,6 +15,7 @@ echo
 
 echo "  ---------> Cloning repositories <---------  "
 
+rm -rf /etc/hyperion
 mkdir -p /etc/hyperion
 git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git" /etc/hyperion/config
 
