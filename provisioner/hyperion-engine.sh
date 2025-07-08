@@ -46,6 +46,7 @@ while true; do
     while IFS= read -r COMPONENT_NAME; do
         COMPONENT_NAME=$(echo "$COMPONENT_NAME" | tr -d '"') # Clean the name from jq output
         MANIFEST_FILE="${COMPONENTS_DIR}/${COMPONENT_NAME}/component.json"
+        log_error "this is where the error is "
 
         if ! check_task_done "$COMPONENT_NAME"; then
             ALL_COMPONENTS_DONE=false # At least one component is not done
