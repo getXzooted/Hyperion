@@ -25,8 +25,6 @@ read -s -p "Enter your GitHub Personal Access Token (PAT): " GITHUB_PAT
 echo
 
 
-sudo rm -rf /opt/Hyperion /etc/hyperion
-
 echo "  ---------> Cloning repositories <---------  "
 git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
 

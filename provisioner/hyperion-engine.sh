@@ -54,7 +54,7 @@ run_core_tasks() {
                 else
                     log_warn "--> ACTION REQUIRED: Task '${SCRIPT_NAME}' requires a reboot. Please run 'sudo reboot' now."
                     # We stop the service cleanly to allow manual reboot.
-                    sudo systemctl stop pi-provisioner.service
+                    sudo systemctl stop hyperion.service
                 fi
                 exit 0
             fi
@@ -90,6 +90,6 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
    fi
 else
     log_info "--- ALL PROVISIONING COMPLETE ---"
-    sudo systemctl disable pi-provisioner.service
+    sudo systemctl disable hyperion.service
     log_info "Provisioning service has been disabled."
 fi
