@@ -8,7 +8,7 @@ set -e
 
 # --- Configuration & Constants ---
 STATE_DIR="/etc/hyperion/state"
-COMPONENTS_DIR="/opt/Hyperion-Forged/components"
+COMPONENTS_DIR="/opt/Hyperion/components"
 CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 UNATTENDED_REBOOT=false
 export NEEDS_REBOOT="false"
