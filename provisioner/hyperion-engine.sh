@@ -25,6 +25,7 @@ mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR
 
 
 # --- Pre Flight Logic ---
+mkdir /etc/hyperion/config
 cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
 
 
