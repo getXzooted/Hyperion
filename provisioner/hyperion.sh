@@ -19,6 +19,10 @@ echo "  ---------> Installing prerequisites (git, jq) <---------  "
 apt-get update && dpkg --configure -a && apt-get install -y --fix-broken git jq
 
 
+echo "  ---------> Cloning repositories <---------  "
+git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
+
+
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
 cp /opt/Hyperion/provisioner/hyperion-engine.sh /usr/local/bin/hyperion-engine.sh
 cp /opt/Hyperion/provisioner/hyperion.service /etc/systemd/system/hyperion.service
