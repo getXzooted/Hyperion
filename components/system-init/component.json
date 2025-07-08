@@ -3,7 +3,7 @@
   "description": "Prepares the base OS with kernel settings, updates, and prerequisites.",
   "dependencies": [],
   "provisions": {
-    "install": "system-init/install.sh",
+    "install": "install.sh",
     "reboot_after": true
   }
 }

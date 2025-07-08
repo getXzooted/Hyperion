@@ -3,7 +3,7 @@
   "description": "Installs the FluxCD GitOps engine and connects it to the Git repository.",
   "dependencies": ["k3s"],
   "provisions": {
-    "install": "flux/install.sh",
+    "install": "install.sh",
     "reboot_after": false
   }
 }
