@@ -1,6 +1,6 @@
 #!/bin/bash
-# hyperion-engine.sh
-# The Hyperion Provisioning Engine
+# hyperion-deployment.sh
+# The Hyperion Provisioning Engine that deploys the custom private configs
 
 
 set -e
@@ -8,9 +8,8 @@ set -e
 
 # --- Configuration & Constants ---
 STATE_DIR="/etc/hyperion/state"
-ENGINE_DIR="/opt/Hyperion"
 COMPONENTS_DIR="/opt/Hyperion/components"
-CONFIG_DIR="/opt/Hyperion/configs"
+CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 UNATTENDED_REBOOT=false
 export NEEDS_REBOOT="false"
 
@@ -31,7 +30,7 @@ ensure_state_dir
 if [ ! -f "$CONFIG_FILE" ]; then log_error "Config not found: ${CONFIG_FILE}"; exit 1; fi
 CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
-# Read the base config for a stable k3s environment
+# Read the user's desired component list from their private config
 PROVISION_LIST=$(jq -c '.provision_list[]' "$CONFIG_FILE")
 if [ -z "$PROVISION_LIST" ]; then
     log_error "The 'provision_list' in your config file is empty or missing."
@@ -120,6 +119,7 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
        log_warn "--------------------------------------------------------"
    fi
 else
-    log_info "--- BASE PROVISIONING COMPLETE ---"
-    sudo /opt/Hyperion/provisioner/input-git.sh
+    log_info "--- ALL PROVISIONING COMPLETE ---"
+    sudo systemctl disable hyperion.service
+    log_info "Provisioning service has been disabled."
 fi

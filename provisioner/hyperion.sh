@@ -19,19 +19,6 @@ echo "  ---------> Installing prerequisites (git, jq) <---------  "
 apt-get update && dpkg --configure -a && apt-get install -y --fix-broken git jq
 
 
-echo "  ---------> Please provide your GitHub credentials to clone your private config repository."
-read -p "Enter your GitHub Username: " GITHUB_USER
-read -s -p "Enter your GitHub Personal Access Token (PAT): " GITHUB_PAT
-echo
-
-
-echo "  ---------> Cloning repositories <---------  "
-git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
-
-mkdir -p /etc/hyperion
-git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git" /etc/hyperion/config
-
-
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
 cp /opt/Hyperion/provisioner/hyperion-engine.sh /usr/local/bin/hyperion-engine.sh
 cp /opt/Hyperion/provisioner/hyperion.service /etc/systemd/system/hyperion.service

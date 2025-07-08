@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "build_name": "Hyperion Prime",
+    "version": "1.0",
+    "description": "The primary, foundational node for the Hyperion ecosystem."
+  },
+  "provision_list": [
+    "system-init",
+    "cgroup-fix",
+    "k3s",
+    "calico",
+    "metallb",
+    "flux"
+  ],
+  "parameters": {
+    "hostname": "hyperion-prime",
+    "reboot_unattended": true,
+    "lan_ip_reservation": "172.16.0.10",
+    "metallb_ip_range": "172.16.0.240-172.16.0.250"
+  }
+}
