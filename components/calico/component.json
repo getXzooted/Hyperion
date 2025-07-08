@@ -1,0 +1,9 @@
+{
+  "name": "calico",
+  "description": "Deploys Calico CNI for networking and policy.",
+  "dependencies": ["k3s"],
+  "provisions": {
+    "install": "install.sh",
+    "reboot_after": false
+  }
+}
