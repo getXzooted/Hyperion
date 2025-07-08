@@ -35,7 +35,7 @@ git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git
 
 
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
-cp /opt/Hyperion/provisioner/hyperion-engine.sh /usr/local/bin/hyperon-engine.sh
+cp /opt/Hyperion/provisioner/hyperion-engine.sh /usr/local/bin/hyperion-engine.sh
 cp /opt/Hyperion/provisioner/hyperion.service /etc/systemd/system/hyperion.service
 chmod +x /usr/local/bin/hyperion-engine.sh
 
