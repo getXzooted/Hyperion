@@ -10,7 +10,7 @@ set -e
 STATE_DIR="/etc/hyperion/state"
 ENGINE_DIR="/opt/Hyperion"
 COMPONENTS_DIR="/opt/Hyperion/components"
-CONFIG_FILE="/opt/Hyperion/configs"
+CONFIG_FILE="/opt/Hyperion/configs/hyperion.json"
 UNATTENDED_REBOOT=false
 export NEEDS_REBOOT="false"
 
