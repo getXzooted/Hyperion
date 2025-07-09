@@ -1,0 +1,11 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: default-deny-all
+spec:
+  # Apply this policy to all pods in all namespaces
+  selector: all()
+  # Deny both incoming (Ingress) and outgoing (Egress) traffic
+  types:
+    - Ingress
+    - Egress

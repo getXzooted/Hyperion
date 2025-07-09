@@ -1,0 +1,26 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-dns-access
+spec:
+  # Apply this egress rule to all pods
+  selector: all()
+  order: 100
+  types:
+    - Egress
+  egress:
+    # Allow TCP and UDP traffic to the CoreDNS pods on port 53
+    - action: Allow
+      protocol: UDP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
