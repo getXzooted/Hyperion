@@ -13,7 +13,7 @@ REPO_DIR="/opt/Hyperion"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
 SERVICE_PATH="/etc/systemd/system/hyperion.service"
-export CONFIG_FILE="/opt/hyperion/configs/hyperion.json"
+export CONFIG_FILE="/opt/Hyperion/configs/hyperion.json"
 
 
 echo "  ---------> Starting Hyperion Bootstrap <---------  "
