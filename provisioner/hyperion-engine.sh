@@ -13,6 +13,7 @@ COMPONENTS_DIR="/opt/Hyperion/components"
 CONFIG_FILE="/opt/Hyperion/configs/hyperion.json"
 UNATTENDED_REBOOT=false
 export NEEDS_REBOOT="false"
+export CONFIG_FILE
 
 
 # --- Logging & State Functions (collapsed for brevity) ---
