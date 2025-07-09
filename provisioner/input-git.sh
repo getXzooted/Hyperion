@@ -7,6 +7,9 @@
 set -e
 
 
+CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
+
+
 echo "  ---------> Please provide your GitHub credentials to clone your private config repository."
 
 read -p "Enter your GitHub Username: " GITHUB_USER
