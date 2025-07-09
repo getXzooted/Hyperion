@@ -20,7 +20,7 @@ curl -s https://fluxcd.io/install.sh | sudo bash
 echo "  ---------> Bootstrapping FluxCD with provided credentials <---------  "
 flux bootstrap github \
   --owner="$GITHUB_USER" \
-  --repository=Hyperion-Forged \
+  --repository=Hyperion \
   --branch=main \
   --path=./kubernetes/base \
   --personal
