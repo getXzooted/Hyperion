@@ -9,8 +9,7 @@
     "cgroup-fix",
     "k3s",
     "calico",
-    "metallb",
-    "flux"
+    "metallb"
   ],
   "parameters": {
     "hostname": "hyperion-prime",
