@@ -10,10 +10,11 @@ set -e
 # --- Configuration & Constants ---
 REPO_URL="https://github.com/getXzooted/Hyperion.git"
 REPO_DIR="/opt/Hyperion"
+BASE_PATH="/opt/Hyperion/configs/hyperion.json"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
 SERVICE_PATH="/etc/systemd/system/hyperion.service"
-export CONFIG_FILE="/opt/Hyperion/configs/hyperion.json"
+export CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 
 
 echo "  ---------> Starting Hyperion Bootstrap <---------  "
@@ -34,7 +35,7 @@ git clone "$REPO_URL" "$REPO_DIR"
 
 
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
-cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
+# cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
 cp "${REPO_DIR}/provisioner/hyperion-engine.sh" "$ENGINE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion.service" "$SERVICE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion" "$COMMAND_PATH"
@@ -76,4 +77,4 @@ echo "Starting in 1"
 sleep 1 
 
 echo "  ---------> Running the Engine <---------  "
-sudo bash /usr/local/bin/hyperion-engine.sh $CONFIG_FILE
+sudo bash /usr/local/bin/hyperion-engine.sh $BASE_PATH
