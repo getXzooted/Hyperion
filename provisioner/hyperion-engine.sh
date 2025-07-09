@@ -125,6 +125,6 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
        log_warn "--------------------------------------------------------"
    fi
 else
-    log_info "--- BASE PROVISIONING COMPLETE ---"
-    sudo /opt/Hyperion/provisioner/input-git.sh
+    log_info "--- BASE PROVISIONING COMPLETE YOU CAN NOW MOVE TO DEPLOYMENT ---"
+    log_info "--- USE SUDO HYPERION TO PROMPT GIT INPUT FOR PRIVATE CONFIGS ---"
 fi
