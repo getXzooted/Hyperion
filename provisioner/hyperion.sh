@@ -26,7 +26,10 @@ git clone https://github.com/getXzooted/Hyperion.git /opt/Hyperion
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
 cp /opt/Hyperion/provisioner/hyperion-engine.sh /usr/local/bin/hyperion-engine.sh
 cp /opt/Hyperion/provisioner/hyperion.service /etc/systemd/system/hyperion.service
+cp /opt/Hyperion/provisioner/hyperion /usr/local/bin/hyperion
 chmod +x /usr/local/bin/hyperion-engine.sh
+chmod +x /usr/local/bin/hyperion
+
 
 echo "  ---------> Enabling the service <---------  "
 systemctl daemon-reload

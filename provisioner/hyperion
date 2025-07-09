@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# The Hyperion Command Line Interface
+# A smart wrapper to control the Hyperion ecosystem.
+
+# Check for root privileges
+if [[ $EUID -ne 0 ]]; then
+   echo "This command must be run as root. Please use 'sudo hyperion'."
+   exit 1
+fi
+
+# Check the status of the hyperion service
+SERVICE_STATUS=$(systemctl is-active hyperion.service || echo "inactive")
+
+case "$SERVICE_STATUS" in
+  "activating"|"active")
+    # If the service is currently running, tail the logs.
+    echo "--> Hyperion service is currently running. Tailing live logs..."
+    echo "    (Press Ctrl+C to stop watching)"
+    journalctl -fu hyperion.service
+    ;;
+  "inactive"|"failed")
+    # If the service is stopped or failed, check if the base platform is complete.
+    if [ -f "/etc/hyperion/state/base_platform_complete.done" ]; then
+        echo "--> Base platform is provisioned."
+        echo "--> Running the custom deployment engine..."
+        # This calls your script that handles the GitHub PAT and deploys your private config.
+        bash /opt/Hyperion/provisioner/input-git.sh
+    else
+        echo "--> Base platform is not yet complete."
+        echo "--> Restarting the provisioning service..."
+        systemctl start hyperion.service
+        echo "--> Service started. To watch its progress, run:"
+        echo "    sudo hyperion"
+    fi
+    ;;
+  *)
+    echo "--> Unknown service state: ${SERVICE_STATUS}"
+    ;;
+esac
