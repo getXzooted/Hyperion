@@ -127,4 +127,5 @@ if [ "$NEEDS_REBOOT" = "true" ]; then
 else
     log_info "--- BASE PROVISIONING COMPLETE YOU CAN NOW MOVE TO DEPLOYMENT ---"
     log_info "--- USE SUDO HYPERION TO PROMPT GIT INPUT FOR PRIVATE CONFIGS ---"
+    touch "/etc/hyperion/state/base_platform_complete.done"
 fi
