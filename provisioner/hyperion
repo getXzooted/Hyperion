@@ -15,7 +15,7 @@ BASE_PLATFORM_MARKER="/etc/hyperion/state/base_platform_complete.done"
 if [ -f "$BASE_PLATFORM_MARKER" ]; then
     echo "--> Base platform is stable. Running the Git input script..."
     # B) If it is, run the script that handles custom deployments.
-    bash /opt/Hyperion/provisioner/input-git.sh
+    exec bash /opt/Hyperion/provisioner/input-git.sh
 else
     # If the platform is NOT complete, show the service logs.
     echo "--> Base platform provisioning is still in progress."
