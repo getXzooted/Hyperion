@@ -15,7 +15,7 @@ echo "  ---------> Waiting for MetalLB controller to become ready <---------  "
 kubectl wait --for=condition=available -n metallb-system deployment/controller --timeout=300s
 
 echo "  ---------> Configuring MetalLB IPAddressPool <---------  "
-IP_RANGE=$(jq -r '.kubernetes_platform.metallb_ip_range' "/etc/hyperion/config/config-$(hostname).json")
+IP_RANGE=$(jq -r '.parameters.metallb_ip_range' "/etc/hyperion/config/config-$(hostname).json")
 if [ -z "$IP_RANGE" ] || [ "$IP_RANGE" = "null" ]; then
   echo "  -> ERROR: Could not find 'metallb_ip_range' in config file: $CONFIG_FILE"
   echo "     Please ensure the key exists under 'parameters' and has a value."
