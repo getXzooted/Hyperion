@@ -5,6 +5,7 @@
 
 set -e
 
+CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 echo "  ---------> Deploying MetalLB Controller <---------  "
