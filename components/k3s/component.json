@@ -4,6 +4,6 @@
   "dependencies": ["cgroup-fix"],
   "provisions": {
     "install": "install.sh",
-    "reboot_after": true
+    "reboot_after": false
   }
 }
