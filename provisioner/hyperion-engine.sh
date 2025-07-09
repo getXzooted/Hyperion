@@ -63,7 +63,7 @@ while true; do
                 INSTALL_SCRIPT=$(jq -r '.provisions.install' "$MANIFEST_FILE")
                 REBOOT_AFTER=$(jq -r '.provisions.reboot_after' "$MANIFEST_FILE")
 
-                sudo GITHUB_USER="$GITHUB_USER" GITHUB_TOKEN="$GITHUB_TOKEN" bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
+                sudo bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
                 # ONLY if the task succeeded, mark it as done and record progress
                if [ -z "$TASK_EXIT_CODE" ] || [ "$TASK_EXIT_CODE" -eq 0 ]; then
                    mark_task_done "$COMPONENT_NAME"
@@ -71,7 +71,7 @@ while true; do
                else
                   # If the task failed (and wasn't a planned reboot), log the error
                   if [ "$TASK_EXIT_CODE" -ne 10 ]; then
-                       log_error "Task '${COMPONENT_NAME}' failed with exit code ${TASK_EXIT_CODE}."
+                       REBOOT_AFTER="true"
                   fi
                fi
 
