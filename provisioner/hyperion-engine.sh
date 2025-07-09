@@ -7,10 +7,9 @@ set -e
 
 
 # --- Configuration & Constants ---
+CONFIG_FILE="$1"
 STATE_DIR="/etc/hyperion/state"
-ENGINE_DIR="/opt/Hyperion"
 COMPONENTS_DIR="/opt/Hyperion/components"
-CONFIG_FILE="/opt/Hyperion/configs/hyperion.json"
 UNATTENDED_REBOOT=false
 export NEEDS_REBOOT="false"
 
@@ -22,11 +21,6 @@ log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') - WARN: $1"; }
 ensure_state_dir() { if [ ! -d "$STATE_DIR" ]; then mkdir -p "$STATE_DIR"; fi; }
 check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
 mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
-
-
-# --- Pre Flight Logic ---
-mkdir -p /etc/hyperion/config
-cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
 
 
 # --- Main Engine Logic ---

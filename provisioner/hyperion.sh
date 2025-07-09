@@ -13,6 +13,7 @@ REPO_DIR="/opt/Hyperion"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
 SERVICE_PATH="/etc/systemd/system/hyperion.service"
+export CONFIG_FILE="/opt/hyperion/configs/hyperion.json"
 
 
 echo "  ---------> Starting Hyperion Bootstrap <---------  "
@@ -21,6 +22,7 @@ if [[ $EUID -ne 0 ]]; then echo "ERROR: This script must be run as root."; exit 
 
 echo "  ---------> Performing pre-flight cleanup <---------  "
 rm -rf /opt/Hyperion /etc/hyperion
+mkdir -p /etc/hyperion/config
 
 
 echo "  ---------> Installing prerequisites (git, jq) <---------  "
@@ -32,6 +34,7 @@ git clone "$REPO_URL" "$REPO_DIR"
 
 
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
+cp $CONFIG_FILE /etc/hyperion/config/config-$(hostname).json
 cp "${REPO_DIR}/provisioner/hyperion-engine.sh" "$ENGINE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion.service" "$SERVICE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion" "$COMMAND_PATH"
@@ -73,4 +76,4 @@ echo "Starting in 1"
 sleep 1 
 
 echo "  ---------> Running the Engine <---------  "
-sudo bash /usr/local/bin/hyperion-engine.sh
+sudo bash /usr/local/bin/hyperion-engine.sh $CONFIG_FILE

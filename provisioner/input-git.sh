@@ -16,7 +16,6 @@ echo
 echo "  ---------> Cloning repositories <---------  "
 
 rm -rf /etc/hyperion
-sleep 1
 mkdir -p /etc/hyperion
 git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git" /etc/hyperion/config
 
@@ -25,4 +24,5 @@ echo "  ---------> Git Connection Made Installing Custom Deployment <---------  
 
 export GITHUB_USER
 export GITHUB_PAT
-sudo /opt/Hyperion/provisioner/hyperion-deployment.sh
+sudo bash /opt/Hyperion/provisioner/hyperion-engine.sh $CONFIG_FILE
+#sudo bash /opt/Hyperion/provisioner/hyperion-deployment.sh $CONFIG_FILE
