@@ -63,31 +63,33 @@ while true; do
                 INSTALL_SCRIPT=$(jq -r '.provisions.install' "$MANIFEST_FILE")
                 REBOOT_AFTER=$(jq -r '.provisions.reboot_after' "$MANIFEST_FILE")
 
-                sudo bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
+                sudo GITHUB_USER="$GITHUB_USER" GITHUB_TOKEN="$GITHUB_TOKEN" bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
                 # ONLY if the task succeeded, mark it as done and record progress
-               if [ -z "$TASK_EXIT_CODE" ] || [ "$TASK_EXIT_CODE" -eq 0 ]; then
-                   mark_task_done "$COMPONENT_NAME"
-                   PROGRESS_MADE_THIS_LOOP=true
-               else
-                  # If the task failed (and wasn't a planned reboot), log the error
-                  if [ "$TASK_EXIT_CODE" -ne 10 ]; then
-                       REBOOT_AFTER="true"
-                  fi
-               fi
-
-
-                if [[ "$REBOOT_AFTER" == "true" ]]; then
+               if [[ -z "$TASK_EXIT_CODE" || "$TASK_EXIT_CODE" -eq 0 ]]; then
+                    # Case 1: The script succeeded (exit code 0).
+                    mark_task_done "$COMPONENT_NAME"
+                    PROGRESS_MADE_THIS_LOOP=true
+                elif [[ "$TASK_EXIT_CODE" -eq 10 ]]; then
+                    # Case 2: The script requested a reboot (exit code 10).
                     UNATTENDED_REBOOT=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
                     if [ "$UNATTENDED_REBOOT" = true ]; then
-                        log_warn "--> Task '${COMPONENT_NAME}' requires reboot. Rebooting automatically in 10 seconds..."
+                        log_warn "--> Task '${COMPONENT_NAME}' requires reboot. Rebooting automatically..."
                         sleep 10
                         sudo reboot
                     else
-                        log_warn "--> ACTION REQUIRED: Task '${COMPONENT_NAME}' requires a reboot. Please run 'sudo reboot' now."
+                        log_warn "--> ACTION REQUIRED: Task '${COMPONENT_NAME}' requires a reboot."
                         sudo systemctl stop hyperion.service # Stop cleanly
                     fi
+                    # Exit the engine immediately since a reboot is pending.
                     exit 0
+                else
+                    # Case 3: The script failed with a different error (e.g., exit code 1).
+                    log_error "Task '${COMPONENT_NAME}' failed with a fatal error (Exit Code: ${TASK_EXIT_CODE})."
+                    log_error "Halting the provisioning engine."
+                    # Exit the engine with a failure code to prevent further loops.
+                    exit 1
                 fi
+
             fi
         fi
     done <<< "$PROVISION_LIST"
