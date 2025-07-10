@@ -22,7 +22,7 @@ flux bootstrap github \
   --owner="$GITHUB_USER" \
   --repository=Hyperion \
   --branch=main \
-  --path=./kubernetes/base \
+  --path=./kubernetes/base/flux-system \
   --personal
 
 echo "  ---------> FluxCD Task Complete. <---------  "
