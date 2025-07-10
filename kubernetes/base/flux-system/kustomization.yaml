@@ -6,5 +6,4 @@ resources:
 - ../calico-system
 - ../metallb-system
 - ../ingress-nginx
-- ../cert-manager
 - ../network-policies/calico
