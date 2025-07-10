@@ -3,13 +3,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-#Flux-Resources
-- gotk-components.yaml
-- gotk-sync.yaml
+  # Bootstrap files for Flux itself
+  - gotk-components.yaml
+  - gotk-sync.yaml
 
-#Kustomizations
-- ../calico-system/operator.yaml
-- ../calico-system/config.yaml
-- ../metallb-system
-- ../ingress-nginx
-- ../network-policies/calico
+  # Includes for our self-contained components
+  - ../calico-system/calico-system.yaml
+  - ../metallb-system/metallb-system.yaml
+#  - ../ingress-nginx
+#  - ../cert-manager
+
