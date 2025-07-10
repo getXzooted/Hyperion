@@ -23,7 +23,7 @@ done
 echo "  ---------> K3s API server is ready. <---------  "
 
 echo "  ---------> Deploying Calico CNI <---------  "
-kubectl apply --server-side -f /opt/Hyperion/kubernetes/manifests/system/calico/tigera-operator.yaml
+kubectl apply --server-side -f /opt/Hyperion/kubernetes/base/calico-system/tigera-operator.yaml
 
 #echo "  -> Patching Calico Operator with initialDelaySeconds..."
 #kubectl patch deployment -n tigera-operator tigera-operator --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/readinessProbe/initialDelaySeconds", "value": 15}]'
@@ -35,7 +35,7 @@ echo "  ---------> Calico Operator is ready. Waiting for Calico API to be establ
 kubectl wait --for condition=established crd/installations.operator.tigera.io --timeout=300s
 
 echo "  ---------> Calico API is ready. Applying Calico custom resource configuration <---------  "
-kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/manifests/system/calico/custom-resources.yaml
+kubectl apply --server-side  --force-conflicts -f /opt/Hyperion/kubernetes/base/calico-system/custom-resources.yaml
 
 echo "  ---------> Waiting for cluster nodes to become Ready as Calico initializes <---------  "
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
