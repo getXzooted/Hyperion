@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: calico-operator
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  path: "./kubernetes/base/calico-system/operator" 
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # This tells Flux to wait until the operator deployment is fully healthy
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tigera-operator
+      namespace: tigera-operator
