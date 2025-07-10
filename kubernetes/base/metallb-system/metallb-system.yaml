@@ -1,0 +1,21 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: metallb-system        # A unique name for this step
+  namespace: flux-system
+spec:
+  # The dependsOn instruction for MetalLB
+  dependsOn:
+    - name: calico-system
+  interval: 10m
+  path: ./kubernetes/base/metallb-system # The path to MetalLB's "playlist"
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # The health check for MetalLB's controller
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: controller
+      namespace: metallb-system

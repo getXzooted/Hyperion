@@ -1,5 +1,38 @@
-# kustomization.yaml for Ingress-Nginx
+# kustomization.yaml for the Ingress-Nginx Component
+# This single file defines both the controller and config stages.
+
+# 1. First, we define a kustomization that just points to the raw manifest.
+# We will reference this from the orchestrator below.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - deploy.yaml
+  - deploy.yaml # The official vendor manifest
+
+---
+# 2. Now, we define the Kustomization OBJECT that orchestrates the deployment.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  # A unique name for this Kustomization object
+  name: ingress-nginx
+  namespace: flux-system
+spec:
+  # It must wait for MetalLB to be healthy before it runs.
+  dependsOn:
+    - name: metallb-system
+
+  # It must wait for its own controller to be ready before it is marked as "healthy".
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: ingress-nginx-controller
+      namespace: ingress-nginx
+
+  # Standard Flux properties
+  interval: 10m
+  # This path MUST point to its own directory.
+  path: ./kubernetes/base/ingress-nginx 
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system

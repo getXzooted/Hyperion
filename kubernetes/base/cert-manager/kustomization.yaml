@@ -1,0 +1,37 @@
+# kustomization.yaml for the Cert-Manager Component
+# This single file defines both the controller and config stages.
+
+# 1. The "Playlist" - This part lists the raw manifest(s) to apply.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cert-manager.yaml # The official vendor manifest
+
+---
+# 2. The "Orchestrator" - This part tells Flux HOW to deploy it.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  # A unique name for this Kustomization object
+  name: cert-manager
+  namespace: flux-system
+spec:
+  # It must wait for the Nginx Ingress to be healthy before it runs.
+  dependsOn:
+    - name: ingress-nginx
+
+  # It must wait for its own webhook to be ready before it is marked as "healthy".
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: cert-manager-webhook
+      namespace: cert-manager
+
+  # Standard Flux properties
+  interval: 10m
+  # This path MUST point to its own directory.
+  path: ./kubernetes/base/cert-manager
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
