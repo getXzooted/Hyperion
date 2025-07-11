@@ -43,7 +43,7 @@ flux create source git flux-system \
   --export > ./gotk-sync.yaml
 
 # Adding the YAML separator to create a valid multi-document file.
-#echo "---" >> ./gotk-sync.yaml
+echo "---" >> ./gotk-sync.yaml
 
 flux create kustomization flux-system \
   --source=flux-system \
