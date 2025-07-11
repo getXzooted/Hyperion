@@ -1,15 +1,53 @@
-#
-
+# The definitive master playlist for Flux, with dependency management.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # Bootstrap files for Flux itself
+  # We no longer list gotk-sync.yaml here. It will be handled below.
   - gotk-components.yaml
-  - gotk-sync.yaml
 
-  # Includes for our self-contained components
-  - ../calico-system/calico-system.yaml
-  - ../metallb-system/metallb-system.yaml
-#  - ../ingress-nginx
-#  - ../cert-manager
+---
+# Stage 1: The Flux Components
+# This Kustomization ensures the Flux engine itself is installed and healthy.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flux-components
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./kubernetes/base/flux-system
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  # Health check to ensure the controllers are running
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: source-controller
+      namespace: flux-system
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: kustomize-controller
+      namespace: flux-system
 
+---
+# Stage 2: The Flux Sync
+# This Kustomization tells Flux to sync the rest of the cluster,
+# but it WAITS for Stage 1 to be complete first.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: flux-sync
+  namespace: flux-system
+spec:
+  # This is the crucial dependency link.
+  dependsOn:
+    - name: flux-components
+  interval: 10m
+  # This points to the Kustomization that orchestrates our components.
+  path: ./kubernetes/base
+  prune: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
