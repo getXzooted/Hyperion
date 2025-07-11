@@ -55,7 +55,7 @@ flux create kustomization flux-system \
 
 echo "  ---------> Step 4: Applying the sync configuration to the cluster <---------  "
 # Now that the cluster is ready, we apply our configuration for the first time.
-kubectl apply --server-side -f ./gotk-sync.yaml
+kubectl apply --server-side --dry-run=server -f ./gotk-sync.yaml
 
 
 echo "  ---------> FluxCD Task Complete. <---------  "
