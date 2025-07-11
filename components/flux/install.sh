@@ -55,13 +55,13 @@ flux create kustomization flux-system \
   --source=flux-system \
   --path="./kubernetes/base" \
   --prune=true \
-#  --validate=false \
+  --validation=none \
   --interval=10m \
   --export >> ./gotk-sync.yaml
 
 echo "  ---------> Step 5: Applying the sync configuration to the cluster <---------  "
 # Now that the cluster is ready, we apply our configuration for the first time.
-kubectl apply --server-side --force-conflicts   -f ./gotk-sync.yaml
+kubectl apply --server-side --force-conflicts --validate=false -f ./gotk-sync.yaml
 
 #--server-side --force-conflicts --dry-run=server
 
