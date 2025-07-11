@@ -30,6 +30,9 @@ spec:
       kind: Deployment
       name: kustomize-controller
       namespace: flux-system
+    - apiVersion: apiextensions.k8s.io/v1
+      kind: CustomResourceDefinition
+      name: kustomizations.kustomize.toolk
 
 ---
 # Stage 2: The Flux Sync
