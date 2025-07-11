@@ -34,7 +34,13 @@ echo "  ---------> Step 2: Waiting for Flux controllers to become ready <-------
 # This is a critical health check to ensure the engine is running before we give it work.
 kubectl wait --for=condition=Ready pods -n flux-system --all --timeout=300s
 
-echo "  ---------> Step 3: Creating the Git source and sync configuration <---------  "
+
+echo "  ---------> Step 3: Waiting for Flux CRDs to be established in the cluster <---------  "
+kubectl wait --for condition=established --timeout=300s crd/gitrepositories.source.toolkit.fluxcd.io
+kubectl wait --for condition=established --timeout=300s crd/kustomizations.kustomize.toolkit.fluxcd.io
+
+
+echo "  ---------> Step 4: Creating the Git source and sync configuration <---------  "
 # This creates the GitRepository and Kustomization manifests that tell Flux what to do.
 flux create source git flux-system \
   --url=${GITHUB_REPO_URL} \
@@ -53,7 +59,7 @@ flux create kustomization flux-system \
   --interval=10m \
   --export >> ./gotk-sync.yaml
 
-echo "  ---------> Step 4: Applying the sync configuration to the cluster <---------  "
+echo "  ---------> Step 5: Applying the sync configuration to the cluster <---------  "
 # Now that the cluster is ready, we apply our configuration for the first time.
 kubectl apply --server-side --dry-run=server -f ./gotk-sync.yaml
 
