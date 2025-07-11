@@ -42,6 +42,9 @@ flux create source git flux-system \
   --interval=1m \
   --export > ./gotk-sync.yaml
 
+# Adding the YAML separator to create a valid multi-document file.
+echo "---" >> ./gotk-sync.yaml
+
 flux create kustomization flux-system \
   --source=flux-system \
   --path="./kubernetes/base" \
