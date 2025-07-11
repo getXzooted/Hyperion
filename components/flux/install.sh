@@ -37,7 +37,7 @@ kubectl wait --for=condition=Ready pods -n flux-system --all --timeout=300s
 echo "  ---------> Step 3: Creating the Git source and sync configuration <---------  "
 # This creates the GitRepository and Kustomization manifests that tell Flux what to do.
 flux create source git flux-system \
-  --url=https://github.com/getXzooted/Hyperion \
+  --url=${GITHUB_REPO_URL} \
   --branch=main \
   --interval=1m \
   --export > ./gotk-sync.yaml
