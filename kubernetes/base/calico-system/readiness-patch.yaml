@@ -1,0 +1,13 @@
+# This patch adds a delay to the readiness probe for the tigera-operator.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigera-operator
+  namespace: tigera-operator
+spec:
+  template:
+    spec:
+      containers:
+        - name: tigera-operator
+          readinessProbe:
+            initialDelaySeconds: 15

@@ -3,3 +3,11 @@ kind: Kustomization
 resources:
   - tigera-operator.yaml
   - custom-resources.yaml
+
+
+patches:
+  - path: readiness-patch.yaml
+    target:
+      kind: Deployment
+      name: tigera-operator
+      namespace: tigera-operator
