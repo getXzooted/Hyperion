@@ -21,5 +21,5 @@ echo "  ---------> Git Connection Made Installing Custom Deployment <---------  
 
 
 export GITHUB_USER
-export GITHUB_TOKEN="$GITHUB_PAT"
+export GITHUB_TOKEN=$GITHUB_PAT
 sudo -E bash /opt/Hyperion/provisioner/hyperion-engine.sh
