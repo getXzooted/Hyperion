@@ -55,7 +55,6 @@ flux create kustomization flux-system \
   --source=flux-system \
   --path="./kubernetes/base" \
   --prune=true \
-  --validation=none \
   --interval=10m \
   --export > ./gotk-kustomization.yaml
 cat ./gotk-kustomization.yaml
