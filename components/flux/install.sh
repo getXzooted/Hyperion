@@ -40,29 +40,30 @@ kubectl wait --for condition=established --timeout=300s crd/gitrepositories.sour
 kubectl wait --for condition=established --timeout=300s crd/kustomizations.kustomize.toolkit.fluxcd.io
 
 
-echo "  ---------> Step 4: Creating the Git source and sync configuration <---------  "
-# This creates the GitRepository and Kustomization manifests that tell Flux what to do.
+echo "  ---------> Step 4: Creating Git source configuration <---------  "
+# First, create ONLY the GitRepository object and save it to its own file.
 flux create source git flux-system \
   --url=${GITHUB_REPO_URL} \
   --branch=main \
   --interval=1m \
-  --export > ./gotk-sync.yaml
+  --export > ./gotk-source.yaml
 
-# Adding the YAML separator to create a valid multi-document file.
-echo "---" >> ./gotk-sync.yaml
 
+echo "  ---------> Step 5: Creating Kustomization sync configuration <---------  "
+# Next, create ONLY the Kustomization object and save it to a separate file.
 flux create kustomization flux-system \
   --source=flux-system \
   --path="./kubernetes/base" \
   --prune=true \
-  --validation=none \
+  --validate=none \
   --interval=10m \
-  --export >> ./gotk-sync.yaml
+  --export > ./gotk-kustomization.yaml
 
-echo "  ---------> Step 5: Applying the sync configuration to the cluster <---------  "
-# Now that the cluster is ready, we apply our configuration for the first time.
-kubectl apply --server-side --force-conflicts --validate=false -f ./gotk-sync.yaml
 
-#--server-side --force-conflicts --dry-run=server
+echo "  ---------> Step 5: Applying configurations sequentially <---------  "
+# Now, apply each file separately. This is a more robust process.
+kubectl apply --server-side --force-conflicts --validate=false -f ./gotk-source.yaml
+kubectl apply --server-side --force-conflicts --validate=false -f ./gotk-kustomization.yaml
+
 
 echo "  ---------> FluxCD Task Complete. <---------  "
