@@ -25,7 +25,7 @@ echo "  ---------> K3s API server is ready. <---------  "
 echo "  ---------> Deploying Calico CNI <---------  "
 kubectl apply --server-side -f /opt/Hyperion/kubernetes/base/calico-system/tigera-operator.yaml
 
-#echo "  -> Patching Calico Operator with initialDelaySeconds..."
+#echo "  ---------> Patching Calico Operator with initialDelaySeconds and tolerations <---------  "
 #kubectl patch deployment -n tigera-operator tigera-operator --type='json' -p='[{"op": "add", "path": "/spec/template/spec/containers/0/readinessProbe/initialDelaySeconds", "value": 15}]'
 
 echo "  ---------> Waiting for Calico Operator Deployment to become available <---------  "

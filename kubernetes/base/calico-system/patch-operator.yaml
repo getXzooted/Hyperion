@@ -1,0 +1,25 @@
+# This single patch applies all necessary modifications to the tigera-operator.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tigera-operator
+  namespace: tigera-operator
+spec:
+  template:
+    spec:
+      # This adds the required tolerations for the node taints.
+      tolerations:
+        - key: "node-role.kubernetes.io/control-plane"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+          effect: "NoSchedule"
+        - key: "node.kubernetes.io/not-ready"
+          operator: "Exists"
+          effect: "NoSchedule"
+      containers:
+        - name: tigera-operator
+          # This adds the required delay to the readiness probe.
+          readinessProbe:
+            initialDelaySeconds: 15

@@ -6,7 +6,7 @@ resources:
 
 
 patches:
-  - path: readiness-patch.yaml
+  - path: patch-operator.yaml
     target:
       kind: Deployment
       name: tigera-operator
