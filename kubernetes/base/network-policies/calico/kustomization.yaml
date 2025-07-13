@@ -6,3 +6,4 @@ resources:
   - allow-dns.yaml
   - ingress-nginx.yaml
   - cert-manager.yaml 
+  - flux-system.yaml
