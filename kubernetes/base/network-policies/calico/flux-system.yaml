@@ -1,19 +1,38 @@
-# This policy allows all pods within the flux-system to communicate freely.
-apiVersion: networking.k8s.io/v1
+# This policy allows all pods within the flux-system to communicate freely
+# and allows them to perform DNS lookups.
+apiVersion: projectcalico.org/v3
 kind: NetworkPolicy
 metadata:
-  name: allow-all-flux-system
+  name: allow-flux-system
   namespace: flux-system
 spec:
   # This selects all pods in the flux-system namespace
-  podSelector: {}
-  policyTypes:
+  selector: all()
+  order: 50
+  types:
     - Ingress
     - Egress
-  # Allow all incoming and outgoing traffic to/from other pods in the same namespace
+  # Allow all incoming traffic from other pods in the same namespace
   ingress:
-    - from:
-      - podSelector: {}
+    - action: Allow
+      source:
+        selector: all()
+  # Allow all outgoing traffic to other pods in the same namespace AND to CoreDNS
   egress:
-    - to:
-      - podSelector: {}
+    - action: Allow
+      destination:
+        selector: all()
+    - action: Allow
+      protocol: UDP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
