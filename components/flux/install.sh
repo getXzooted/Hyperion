@@ -57,7 +57,7 @@ flux create kustomization flux-system \
   --prune=true \
   --interval=10m \
   --export > ./gotk-kustomization.yaml
-cat ./gotk-kustomization.yaml
+
 
 echo "  ---------> Step 5: Applying configurations sequentially <---------  "
 # Now, apply each file separately. This is a more robust process.
