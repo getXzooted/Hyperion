@@ -4,3 +4,5 @@ kind: Kustomization
 resources:
   - deny-all.yaml
   - allow-dns.yaml
+  - ingress-nginx.yaml
+  - cert-manager.yaml 

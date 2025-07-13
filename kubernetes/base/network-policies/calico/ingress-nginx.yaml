@@ -1,0 +1,20 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-ingress-nginx
+spec:
+  selector: all()
+  order: 110
+  types:
+    - Ingress
+  ingress:
+    # Allow HTTP and HTTPS traffic from any source
+    - action: Allow
+      protocol: TCP
+      destination:
+        # This targets the ingress-nginx pods
+        selector: app.kubernetes.io/name == 'ingress-nginx'
+        namespaceSelector: name == 'ingress-nginx'
+        ports:
+          - 80
+          - 443

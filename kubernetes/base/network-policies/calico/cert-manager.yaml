@@ -1,0 +1,18 @@
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-cert-manager-acme
+spec:
+  selector: all()
+  order: 120
+  types:
+    - Egress
+  egress:
+    # Allow cert-manager pods to talk to the internet for challenges
+    - action: Allow
+      source:
+        namespaceSelector: name == 'cert-manager'
+      destination:
+        ports:
+          - 80
+          - 443
