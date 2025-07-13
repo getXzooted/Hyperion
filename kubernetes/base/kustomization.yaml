@@ -5,9 +5,9 @@ kind: Kustomization
 resources:
 
   # Includes for our self-contained components
-  - ../calico-system
-  - ../metallb-system
-  - ../network-policies
+  - /calico-system
+  - /metallb-system
+  - /network-policies
 #  - ../ingress-nginx
 #  - ../cert-manager
 
