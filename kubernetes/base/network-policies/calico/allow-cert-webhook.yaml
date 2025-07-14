@@ -1,0 +1,15 @@
+# This policy allows the Kubernetes API server to reach webhook pods.
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-api-server-to-webhooks
+spec:
+  order: 50
+  # This applies to all pods that have the 'webhook' label.
+  selector: 'webhook.cert-manager.io/sources' in 'all'
+  types:
+    - Ingress
+  ingress:
+    # We allow traffic from any source, as the API server's source IP
+    # can be unpredictable. The security is handled by the webhook's own TLS.
+    - action: Allow
