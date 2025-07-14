@@ -1,15 +1,25 @@
+# This policy allows the Ingress-Nginx components to talk to the API server.
 apiVersion: projectcalico.org/v3
 kind: NetworkPolicy
 metadata:
-  name: allow-ingress-nginx-core
+  name: allow-ingress-nginx-to-apiserver
   namespace: ingress-nginx
 spec:
+  # This policy applies to all pods within the ingress-nginx namespace
   selector: all()
   order: 100
   types:
-    - Ingress
     - Egress
-  ingress:
-    - action: Allow
+
+  # Define rules for OUTGOING traffic from the ingress-nginx pods
   egress:
+    # Allow them to talk to the Kubernetes API server
     - action: Allow
+      protocol: TCP
+      destination:
+        services:
+          name: kubernetes
+          namespace: default
+        ports:
+          - 443
+          - 6443
