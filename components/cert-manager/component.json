@@ -1,0 +1,9 @@
+{
+  "name": "cert-manager",
+  "description": "Deploys Cert-Manager for automated TLS certificates.",
+  "dependencies": ["ingress-nginx"],
+  "provisions": {
+    "install": "cert-manager/install.sh",
+    "reboot_after": false
+  }
+}

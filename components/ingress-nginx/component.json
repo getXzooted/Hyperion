@@ -1,0 +1,9 @@
+{
+  "name": "ingress-nginx",
+  "description": "Deploys the Nginx Ingress Controller for web traffic.",
+  "dependencies": ["metallb"],
+  "provisions": {
+    "install": "ingress-nginx/install.sh",
+    "reboot_after": false
+  }
+}
