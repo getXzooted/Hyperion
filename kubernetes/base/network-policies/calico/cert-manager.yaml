@@ -1,46 +1,19 @@
-# This is the new, more secure policy for Cert-Manager
 apiVersion: projectcalico.org/v3
 kind: NetworkPolicy
 metadata:
-  name: allow-apiserver-to-cert-manager
+  name: allow-cert-manager-core
   namespace: cert-manager
 spec:
-  # This policy applies ONLY to the cert-manager webhook pods
-  selector: app.kubernetes.io/name == 'webhook'
+  selector: all()
   order: 100
   types:
     - Ingress
-  ingress:
-    # Allow ingress traffic ONLY from the Kubernetes API server
-    - action: Allow
-      protocol: TCP
-      source:
-        # We select the host's network endpoints, where the K3s API server lives
-        selector: 'has(projectcalico.org/host-endpoint)'
-      destination:
-        ports:
-          - 6443 # This is the port the webhook listens on
----
-# This second policy allows cert-manager to talk to the outside world
-apiVersion: projectcalico.org/v3
-kind: NetworkPolicy
-metadata:
-  name: allow-cert-manager-egress
-  namespace: cert-manager
-spec:
-  podSelector: {} # Applies to all pods in the namespace
-  order: 200
-  types:
     - Egress
+  ingress:
+    # Allow its own pods to talk to each other
+    - action: Allow
+      source:
+        selector: all()
   egress:
-    # Allow it to talk to the cluster's own DNS server
+    # Allow it to talk to the Kubernetes API server and the internet
     - action: Allow
-      destination:
-        namespaceSelector: name == 'kube-system'
-        selector: k8s-app == 'kube-dns'
-    # Allow it to talk to the internet for ACME challenges
-    - action: Allow
-      destination:
-        ports:
-          - 443
-          - 80
