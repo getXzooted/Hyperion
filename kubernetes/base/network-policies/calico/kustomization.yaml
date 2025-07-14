@@ -7,5 +7,6 @@ resources:
 #  - kube-dns.yaml
   - ingress-nginx.yaml
   - cert-manager.yaml 
+  - allow-core-dns.yaml
 #  - flux-system.yaml
 #  - allow-cert-webhook.yaml
