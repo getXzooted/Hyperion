@@ -1,11 +1,11 @@
 apiVersion: projectcalico.org/v3
 kind: NetworkPolicy
 metadata:
-  name: allow-ingress-nginx-core
-  namespace: ingress-nginx
+  name: allow-kube-system-core
+  namespace: kube-system
 spec:
   selector: all()
-  order: 100
+  order: 50
   types:
     - Ingress
     - Egress

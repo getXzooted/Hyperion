@@ -10,10 +10,6 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow its own pods to talk to each other
     - action: Allow
-      source:
-        selector: all()
   egress:
-    # Allow it to talk to the Kubernetes API server and the internet
     - action: Allow
