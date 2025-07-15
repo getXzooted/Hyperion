@@ -1,0 +1,25 @@
+# This policy allows core system components to talk to the API server.
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-kube-system-egress
+  namespace: kube-system
+spec:
+  # This policy applies to all pods within the kube-system namespace
+  selector: all()
+  order: 50
+  types:
+    - Egress
+
+  # Define a rule for OUTGOING traffic
+  egress:
+    # Allow traffic to the Kubernetes API server service
+    - action: Allow
+      protocol: TCP
+      destination:
+        services:
+          name: kubernetes
+          namespace: default
+        ports:
+          - 443
+          - 6443

@@ -5,6 +5,7 @@ resources:
   - deny-all.yaml
   - allow-dns.yaml
   - kube-system.yaml
+  - kube-system-egress.yaml
 #  - kube-dns.yaml
 #  - ingress-nginx.yaml
 #  - cert-manager.yaml 
