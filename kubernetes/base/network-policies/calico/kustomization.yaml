@@ -4,10 +4,10 @@ kind: Kustomization
 resources:
   - deny-all.yaml
   - allow-dns.yaml
+  - kube-system.yaml
 #  - kube-dns.yaml
 #  - ingress-nginx.yaml
 #  - cert-manager.yaml 
 #  - allow-core-dns.yaml
-#  - kube-system.yaml
 #  - flux-system.yaml
 #  - allow-cert-webhook.yaml
