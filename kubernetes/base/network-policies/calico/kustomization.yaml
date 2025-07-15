@@ -7,6 +7,7 @@ resources:
   - kube-system.yaml
   - kube-system-egress.yaml
   - allow-coredns-egress.yaml
+  - allow-dns-ingress.yaml
 #  - kube-dns.yaml
 #  - ingress-nginx.yaml
 #  - cert-manager.yaml 

@@ -1,0 +1,27 @@
+# This policy allows any pod in the cluster to send DNS requests to CoreDNS.
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-ingress
+  namespace: kube-system
+spec:
+  # This policy applies ONLY to the CoreDNS pods
+  selector: k8s-app == 'kube-dns'
+  order: 40
+  types:
+    - Ingress
+
+  # Define rules for INCOMING traffic
+  ingress:
+    - action: Allow
+      protocol: UDP
+      source: {} # An empty source means "allow from any source"
+      destination:
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      source: {} # An empty source means "allow from any source"
+      destination:
+        ports:
+          - 53
