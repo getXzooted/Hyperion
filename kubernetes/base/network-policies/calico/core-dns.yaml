@@ -1,0 +1,48 @@
+# filename: policy-coredns.yaml
+apiVersion: projectcalico.org/v3
+kind: GlobalNetworkPolicy
+metadata:
+  name: platform-coredns-access
+spec:
+  # Apply this policy to CoreDNS pods in the kube-system namespace
+  selector: k8s-app == 'kube-dns'
+  namespaceSelector: name == 'kube-system'
+  order: 100
+  
+  # This policy governs both Ingress and Egress traffic
+  types:
+    - Ingress
+    - Egress
+
+  # INGRESS: Allow incoming DNS queries from any pod in the cluster
+  ingress:
+    - action: Allow
+      protocol: UDP
+      source: {} # An empty source selector means "from all sources"
+      destination:
+        ports: [53]
+    - action: Allow
+      protocol: TCP
+      source: {}
+      destination:
+        ports: [53]
+
+  # EGRESS: Allow CoreDNS to make required outbound connections
+  egress:
+    # Rule to solve the deadlock: Allow traffic to the K8s API Server
+    - action: Allow
+      protocol: TCP
+      destination:
+        # Selects the master node's host endpoint via the label
+        selector: has(node-role.kubernetes.io/master)
+        ports: [6443] # Default K3s API server port
+
+    # (Optional but Recommended) Allow CoreDNS to talk to upstream resolvers if needed
+    # - action: Allow
+    #   protocol: UDP
+    #   destination:
+    #     # Example: Google DNS
+    #     nets:
+    #       - "8.8.8.8/32"
+    #       - "8.8.4.4/32"
+    #     ports: [53]
