@@ -1,0 +1,35 @@
+# This policy allows Calico's own components to function in a zero-trust environment.
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-calico-system
+  namespace: calico-system
+spec:
+  # This policy applies to all pods within the calico-system namespace
+  selector: all()
+  order: 50
+  types:
+    - Ingress
+    - Egress
+
+  # Allow all INCOMING traffic from other pods within the SAME namespace
+  ingress:
+    - action: Allow
+      source:
+        selector: all()
+
+  # Allow all OUTGOING traffic to other pods within the SAME namespace
+  # AND to the Kubernetes API server.
+  egress:
+    - action: Allow
+      destination:
+        selector: all()
+    - action: Allow
+      protocol: TCP
+      destination:
+        services:
+          name: kubernetes
+          namespace: default
+        ports:
+          - 443
+          - 6443

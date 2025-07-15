@@ -1,0 +1,38 @@
+# This policy allows FluxCD components to communicate with each other
+# and with the cluster's DNS service.
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-flux-system-communication
+  namespace: flux-system
+spec:
+  # This policy applies to all pods within the flux-system namespace
+  selector: all()
+  order: 50
+  types:
+    - Ingress
+    - Egress
+  # Allow all INCOMING traffic from other pods within the SAME namespace
+  ingress:
+    - action: Allow
+      source:
+        selector: all()
+  # Allow all OUTGOING traffic to other pods in the SAME namespace AND to CoreDNS
+  egress:
+    - action: Allow
+      destination:
+        selector: all()
+    - action: Allow
+      protocol: UDP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
+    - action: Allow
+      protocol: TCP
+      destination:
+        namespaceSelector: name == 'kube-system'
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
