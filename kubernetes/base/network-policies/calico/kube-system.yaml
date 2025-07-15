@@ -1,8 +1,8 @@
-# This policy allows core Kubernetes components to function in a zero-trust environment.
+# This single, definitive policy allows the kube-system to function.
 apiVersion: projectcalico.org/v3
 kind: NetworkPolicy
 metadata:
-  name: allow-kube-system-intra-namespace
+  name: allow-kube-system
   namespace: kube-system
 spec:
   # This policy applies to all pods within the kube-system namespace
@@ -11,22 +11,28 @@ spec:
   types:
     - Ingress
     - Egress
-  # Allow all traffic to/from other pods within the same namespace
+
+  # Define rules for INCOMING traffic
   ingress:
+    # Allow any pod in the cluster to send DNS requests TO CoreDNS pods
     - action: Allow
-      source:
-        selector: all()
-  egress:
-    - action: Allow
+      protocol: UDP
       destination:
-        selector: all()
-    # Explicitly allow egress to the Kubernetes API server
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
     - action: Allow
       protocol: TCP
+      destination:
+        selector: k8s-app == 'kube-dns'
+        ports:
+          - 53
+
+  # Define rules for OUTGOING traffic
+  egress:
+    # Allow all pods in kube-system to talk to the Kubernetes API server
+    - action: Allow
       destination:
         services:
           name: kubernetes
           namespace: default
-        ports:
-          - 443
-          - 6443
