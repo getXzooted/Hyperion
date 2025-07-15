@@ -4,7 +4,7 @@ metadata:
   name: allow-dns-access
 spec:
   # Apply this egress rule to all pods
-  selector: all()
+  selector: 'k8s-app != "kube-dns"'
   order: 100
   types:
     - Egress
