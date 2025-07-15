@@ -1,0 +1,25 @@
+# This policy allows CoreDNS to talk to the Kube API server to resolve internal services.
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: allow-coredns-egress-to-apiserver
+  namespace: kube-system
+spec:
+  # This policy applies ONLY to the CoreDNS pods
+  selector: k8s-app == 'kube-dns'
+  order: 80
+  types:
+    - Egress
+
+  # Define a rule for OUTGOING traffic from CoreDNS
+  egress:
+    # Allow it to talk to the Kubernetes API server service
+    - action: Allow
+      protocol: TCP
+      destination:
+        services:
+          name: kubernetes
+          namespace: default
+        ports:
+          - 443
+          - 6443
