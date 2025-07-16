@@ -3,6 +3,8 @@ kind: Deployment
 metadata:
   name: wireguard
   namespace: wireguard
+  labels:
+    app: wireguard
 spec:
   replicas: 1
   selector:
@@ -17,18 +19,27 @@ spec:
         - name: wireguard
           image: lscr.io/linuxserver/wireguard:latest
           env:
-            # These would be replaced by Sealed Secrets in a real deployment
             - name: PUID
               value: "1000"
             - name: PGID
               value: "1000"
             - name: TZ
-              value: "Etc/UTC"
+              value: "Etc/UTC" # Change this to your timezone
           ports:
             - containerPort: 51820
+              name: wireguard
               protocol: UDP
+          # This is a critical security setting for a VPN
           securityContext:
             capabilities:
               add:
                 - NET_ADMIN
                 - SYS_MODULE
+          # This volume will store the WireGuard configuration
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: wireguard-config-pvc
