@@ -1,0 +1,6 @@
+{
+  "name": "prometheus",
+  "description": "Deploys the Prometheus monitoring system.",
+  "dependencies": ["loki"],
+  "provisions": { "install": "install.sh" }
+}

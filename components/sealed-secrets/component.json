@@ -3,7 +3,7 @@
   "description": "Deploys the Sealed Secrets controller for secure, GitOps-friendly secret management.",
   "dependencies": ["cert-manager"],
   "provisions": {
-    "install": "sealed-secrets/install.sh",
+    "install": "install.sh",
     "reboot_after": false
   }
 }
