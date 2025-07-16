@@ -1,0 +1,9 @@
+{
+  "name": "wireguard",
+  "description": "Deploys a WireGuard VPN server.",
+  "dependencies": ["ingress-nginx"],
+  "provisions": {
+    "install": "wireguard/install.sh",
+    "reboot_after": false
+  }
+}
