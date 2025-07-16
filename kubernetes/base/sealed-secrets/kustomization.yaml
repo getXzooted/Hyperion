@@ -1,0 +1,7 @@
+# kustomization.yaml for Sealed-Secrets
+
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - controller.yaml
