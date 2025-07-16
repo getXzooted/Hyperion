@@ -3,12 +3,36 @@
 # The Hyperion Command Line Interface
 
 
+set -e
+
+
 # Check for root privileges
 if [[ $EUID -ne 0 ]]; then
    echo "This command must be run as root. Please use 'sudo hyperion'."
    exit 1
 fi
 
+
+# Set the KUBECONFIG for all kubectl/flux commands
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+
+# --- Flag Handling ---
+if [ "$1" == "--dashboard-kube" ]; then
+    echo "--> Starting Kubernetes Dashboard proxy in the background..."
+    # Start the proxy in the background
+    kubectl proxy &
+    # Give it a moment to start
+    sleep 2
+    sudo bash -E /opt/Hyperion/provisioner/get-dashboard-token.sh
+    echo "--> Proxy started. You can now access the dashboard on your main computer at:"
+    echo "    http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+    echo "--> To get another login token, run 'sudo /opt/Hyperion/provisioner/get-dashboard-token.sh'"
+    exit 0
+fi
+
+
+# --- Main Logic ---
 BASE_PLATFORM_MARKER="/etc/hyperion/state/base_platform_complete.done"
 
 # A) Check if the base platform is fully provisioned.

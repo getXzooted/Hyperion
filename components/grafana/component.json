@@ -1,6 +1,0 @@
-{
-  "name": "grafana",
-  "description": "Deploys the Grafana visualization dashboard.",
-  "dependencies": ["prometheus"],
-  "provisions": { "install": "install.sh" }
-}

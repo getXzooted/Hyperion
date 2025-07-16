@@ -1,6 +1,0 @@
-{
-  "name": "loki",
-  "description": "Deploys the Loki log aggregation system.",
-  "dependencies": ["flux"],
-  "provisions": { "install": "install.sh" }
-}

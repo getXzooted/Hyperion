@@ -1,0 +1,9 @@
+{
+  "name": "kubernetes-dashboard",
+  "description": "Deploys the official Kubernetes Dashboard UI.",
+  "dependencies": ["flux"],
+  "provisions": {
+    "install": "install.sh",
+    "reboot_after": false
+  }
+}
