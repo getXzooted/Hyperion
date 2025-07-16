@@ -18,6 +18,17 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 
 # --- Flag Handling ---
+
+if [ "$1" == "--kill-proxy" ]; then
+    echo "--> Searching for and stopping the 'kubectl proxy' process..."
+    # The pkill command is a more direct way to find and kill a process by name.
+    # The -f flag matches against the full command line string.
+    pkill -f 'kubectl proxy' || echo "--> No running proxy process found."
+    echo "--> Done."
+    exit 0
+fi
+
+
 if [ "$1" == "--dashboard-kube" ]; then
     echo "--> Starting Kubernetes Dashboard proxy in the background..."
     # Start the proxy in the background
