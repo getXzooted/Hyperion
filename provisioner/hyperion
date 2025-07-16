@@ -32,12 +32,12 @@ fi
 if [ "$1" == "--dashboard-kube" ]; then
     echo "--> Starting Kubernetes Dashboard proxy in the background..."
     # Start the proxy in the background
-    kubectl proxy &
+    kubectl proxy --address='0.0.0.0' &
     # Give it a moment to start
     sleep 2
     sudo bash -E /opt/Hyperion/provisioner/get-dashboard-token.sh
     echo "--> Proxy started. You can now access the dashboard on your main computer at:"
-    echo "    http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+    echo "    http://<ip_address>:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
     echo "--> To get another login token, run 'sudo /opt/Hyperion/provisioner/get-dashboard-token.sh'"
     exit 0
 fi
