@@ -11,7 +11,7 @@ spec:
       labels: { app: perplexica }
     spec:
       containers:
-      - image: lscr.io/linuxserver/perplexica:latest
+      - image: itzcrazykns1337/perplexica:main
         name: perplexica
         ports:
         - containerPort: 3001
