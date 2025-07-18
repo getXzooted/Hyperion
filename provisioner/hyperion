@@ -19,28 +19,42 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 # --- Flag Handling ---
 
-if [ "$1" == "--kill-proxy" ]; then
-    echo "--> Searching for and stopping the 'kubectl proxy' process..."
-    # The pkill command is a more direct way to find and kill a process by name.
-    # The -f flag matches against the full command line string.
-    pkill -f 'kubectl proxy' || echo "--> No running proxy process found."
-    echo "--> Done."
-    exit 0
-fi
+# --- Flag Handling ---
+case "$1" in
+    --dns)
+        echo "--> Querying for Pi-hole DNS service IP..."
+        # This command gets the service and uses a jsonpath to extract only the IP.
+        DNS_IP=$(kubectl get svc pihole-dns-svc -n pi-hole -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || echo "not found")
 
+        if [ "$DNS_IP" = "not found" ]; then
+            echo "--> ERROR: Could not retrieve the IP address. Is the pi-hole component installed and running?"
+            exit 1
+        fi
 
-if [ "$1" == "--dashboard-kube" ]; then
-    echo "--> Starting Kubernetes Dashboard proxy in the background..."
-    # Start the proxy in the background
-    kubectl proxy --address='0.0.0.0' &
-    # Give it a moment to start
-    sleep 2
-    sudo bash -E /opt/Hyperion/provisioner/get-dashboard-token.sh
-    echo "--> Proxy started. You can now access the dashboard on your main computer at:"
-    echo "    http://<ip_address>:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
-    echo "--> To get another login token, run 'sudo /opt/Hyperion/provisioner/get-dashboard-token.sh'"
-    exit 0
-fi
+        echo "    Your Hyperion DNS Address is: ${DNS_IP}"
+        exit 0
+        ;;
+    --kill-proxy)
+        echo "--> Searching for and stopping the 'kubectl proxy' process..."
+        # The pkill command is a more direct way to find and kill a process by name.
+        # The -f flag matches against the full command line string.
+        pkill -f 'kubectl proxy' || echo "--> No running proxy process found."
+        echo "--> Done."
+        exit 0
+        ;;
+    --dashboard-kube)
+        echo "--> Starting Kubernetes Dashboard proxy in the background..."
+        # Start the proxy in the background
+        kubectl proxy --address='0.0.0.0' &
+        # Give it a moment to start
+        sleep 2
+        sudo bash -E /opt/Hyperion/provisioner/get-dashboard-token.sh
+        echo "--> Proxy started. You can now access the dashboard on your main computer at:"
+        echo "    http://<ip_address>:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
+        echo "--> To get another login token, run 'sudo /opt/Hyperion/provisioner/get-dashboard-token.sh'"
+        exit 0
+        ;;
+esac
 
 
 # --- Main Logic ---
