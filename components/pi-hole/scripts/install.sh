@@ -6,6 +6,10 @@ set -e
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
+echo "  -> Ensuring the 'pi-hole' namespace exists..."
+kubectl create namespace pi-hole --dry-run=client -o yaml | kubectl apply -f -
+
+
 # --- Read Configs ---
 # Read our own component manifest
 COMPONENT_MANIFEST="/opt/Hyperion/components/pi-hole/component.json"
