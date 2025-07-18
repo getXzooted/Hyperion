@@ -11,7 +11,7 @@ spec:
       labels: { app: perplexica }
     spec:
       containers:
-      - image: itzcrazykns1337/perplexica:main
+      - image: itzcrazykns1337/perplexica:arm64
         name: perplexica
         ports:
         - containerPort: 3001
