@@ -1,0 +1,8 @@
+{
+  "name": "searxng",
+  "description": "Deploys the SearXNG private meta-search engine.",
+  "dependencies": ["ingress-nginx"],
+  "provisions": {
+    "install": "scripts/install.sh"
+  }
+}

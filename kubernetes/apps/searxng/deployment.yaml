@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searxng
+  namespace: searxng
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: searxng } }
+  template:
+    metadata:
+      labels: { app: searxng }
+    spec:
+      containers:
+      - image: searxng/searxng:latest
+        name: searxng
+        ports:
+        - containerPort: 8080
+          name: http

@@ -1,0 +1,8 @@
+{
+  "name": "perplexica",
+  "description": "Deploys the Perplexica AI search front-end.",
+  "dependencies": ["searxng"],
+  "provisions": {
+    "install": "scripts/install.sh"
+  }
+}

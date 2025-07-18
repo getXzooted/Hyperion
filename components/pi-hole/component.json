@@ -1,0 +1,13 @@
+{
+  "name": "pi-hole",
+  "description": "Deploys Pi-hole for network-wide ad-blocking.",
+  "dependencies": ["metallb"],
+  "provisions": {
+    "install": "scripts/install.sh"
+  },
+  "deployment": {
+    "type": "helm",
+    "chart": "pi-hole",
+    "repository": "https://mojo-majo.github.io/pihole-helm"
+  }
+}

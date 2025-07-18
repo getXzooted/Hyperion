@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: perplexica
+  namespace: perplexica
+spec:
+  replicas: 1
+  selector: { matchLabels: { app: perplexica } }
+  template:
+    metadata:
+      labels: { app: perplexica }
+    spec:
+      containers:
+      - image: itorr/perplexica:latest
+        name: perplexica
+        ports:
+        - containerPort: 3001
+          name: http
+        env:
+        # This tells Perplexica to use your internal SearXNG service
+        - name: SEARXNG_URL
+          value: "http://searxng-svc.searxng.svc.cluster.local:8080"
