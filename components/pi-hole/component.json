@@ -1,7 +1,7 @@
 {
   "name": "pi-hole",
   "description": "Deploys Pi-hole for network-wide ad-blocking.",
-  "dependencies": ["metallb"],
+  "dependencies": ["metallb", "flux"],
   "provisions": {
     "install": "scripts/install.sh"
   },
