@@ -7,7 +7,7 @@
 set -e
 
 # --- Configuration ---
-PRIVATE_CONFIG_DIR="/tmp/hyperion-private-config"
+PRIVATE_CONFIG_DIR="/etc/hyperion/config"
 PUBLIC_REPO_URL="https://github.com/getXzooted/Hyperion"
 COMPONENTS_DIR="/opt/Hyperion/components"
 
@@ -31,13 +31,7 @@ git clone "https://_:${GITHUB_PAT}@github.com/${GITHUB_USER}/Hyperion-config.git
 
 echo "  ---------> Git Connection Made Installing Custom Deployment <---------  "
 
-# 3. Run Main Engine
-export GITHUB_USER
-export GITHUB_TOKEN=$GITHUB_PAT
-sudo -E bash /opt/Hyperion/provisioner/hyperion-engine.sh
-
-
-# 4. Read User's Config
+# 3. Read User's Config
 CONFIG_FILE="${PRIVATE_CONFIG_DIR}/config-$(hostname).json"
 if [ ! -f "$CONFIG_FILE" ]; then
     echo "--> ERROR: Could not find config file: $CONFIG_FILE"
@@ -45,6 +39,10 @@ if [ ! -f "$CONFIG_FILE" ]; then
 fi
 PROVISION_LIST=$(jq -r '.provision_list[]' "$CONFIG_FILE")
 
+# 4. Run Main Engine
+export GITHUB_USER
+export GITHUB_TOKEN=$GITHUB_PAT
+sudo -E bash /opt/Hyperion/provisioner/hyperion-engine.sh $CONFIG_FILE
 
 # 5. Generate the kustomization.yaml "Shopping List"
 echo "--> Generating GitOps configuration..."
