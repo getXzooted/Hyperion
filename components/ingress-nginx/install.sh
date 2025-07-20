@@ -13,5 +13,6 @@ kubectl apply -f /opt/Hyperion/kubernetes/base/ingress-nginx/deploy.yaml
 
 echo "  ---------> Waiting for Nginx Ingress Controller to become ready <---------  "
 kubectl wait --for=condition=available -n ingress-nginx deployment/ingress-nginx-controller --timeout=300s
+kubectl wait --for=condition=available -n ingress-nginx deployment/ingress-nginx-controller-admission --timeout=180s
 
 echo "  ---------> Ingress-Nginx component installed successfully. <---------  "
