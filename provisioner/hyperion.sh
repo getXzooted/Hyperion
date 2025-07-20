@@ -10,6 +10,7 @@ set -e
 # --- Configuration & Constants ---
 REPO_URL="https://github.com/getXzooted/Hyperion.git"
 REPO_DIR="/opt/Hyperion"
+CONFIG_DIR="/etc/hyperion"
 BASE_PATH="/opt/Hyperion/configs/hyperion.json"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
@@ -23,8 +24,8 @@ if [[ $EUID -ne 0 ]]; then echo "ERROR: This script must be run as root."; exit 
 
 
 echo "  ---------> Performing pre-flight cleanup <---------  "
-rm -rf /opt/Hyperion /etc/hyperion
-mkdir -p /etc/hyperion/config
+rm -rf "$REPO_DIR" "$CONFIG_DIR"
+mkdir -p "$CONFIG_DIR"/config
 
 
 echo "  ---------> Installing prerequisites (git, jq) <---------  "
@@ -81,4 +82,4 @@ echo "Starting in 1"
 sleep 1 
 
 echo "  ---------> Running the Engine <---------  "
-sudo bash /usr/local/bin/hyperion-engine.sh $BASE_PATH
+sudo bash $ENGINE_PATH $BASE_PATH
