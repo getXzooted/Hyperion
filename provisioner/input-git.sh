@@ -8,7 +8,8 @@ set -e
 
 # --- Configuration ---
 PRIVATE_CONFIG_DIR="/tmp/hyperion-private-config"
-PUBLIC_REPO_URL="https://github.com/getXzooted/Hyperion" # Your public repo
+PUBLIC_REPO_URL="https://github.com/getXzooted/Hyperion"
+COMPONENTS_DIR="/opt/Hyperion/components"
 
 
 # --- Main Logic ---
@@ -79,7 +80,11 @@ if ! git diff --staged --quiet; then
 fi
 cd ~ # Return to home directory
 
-# 7. Bootstrap Flux
+# 7. Custom Configurations
+echo "  ---------> Applying User Component Configurations <---------  "
+sudo bash /usr/local/bin/component-configs.sh
+
+# 8. Bootstrap Flux
 echo "--> Handing off control to FluxCD..."
 export GITHUB_TOKEN=$GITHUB_PAT
 flux bootstrap github \

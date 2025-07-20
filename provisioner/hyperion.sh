@@ -14,6 +14,7 @@ BASE_PATH="/opt/Hyperion/configs/hyperion.json"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
 SERVICE_PATH="/etc/systemd/system/hyperion.service"
+CONFIG_PATH="/usr/local/bin/component-configs.sh"
 CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 
 
@@ -35,11 +36,13 @@ git clone "$REPO_URL" "$REPO_DIR"
 
 
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
-cp "$BASE_PATH" "$CONFIG_FILE"
+cp "${REPO_DIR}/provisioner/component-configs.sh" "$CONFIG_PATH"
 cp "${REPO_DIR}/provisioner/hyperion-engine.sh" "$ENGINE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion.service" "$SERVICE_PATH"
 cp "${REPO_DIR}/provisioner/hyperion" "$COMMAND_PATH"
+cp "$BASE_PATH" "$CONFIG_FILE"
 chmod +x "${REPO_DIR}/provisioner/get-dashboard-token.sh"
+chmod +x "$CONFIG_PATH"
 chmod +x "$ENGINE_PATH"
 chmod +x "$COMMAND_PATH"
 
