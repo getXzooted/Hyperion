@@ -13,8 +13,8 @@ REPO_DIR="/opt/Hyperion"
 BASE_PATH="/opt/Hyperion/configs/hyperion.json"
 COMMAND_PATH="/usr/local/bin/hyperion"
 ENGINE_PATH="/usr/local/bin/hyperion-engine.sh"
-SERVICE_PATH="/etc/systemd/system/hyperion.service"
 CONFIG_PATH="/usr/local/bin/component-configs.sh"
+SERVICE_PATH="/etc/systemd/system/hyperion.service"
 CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
 
 

@@ -18,8 +18,6 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
 
 # --- Flag Handling ---
-
-# --- Flag Handling ---
 case "$1" in
     --dns)
         echo "--> Querying for Pi-hole DNS service IP..."
