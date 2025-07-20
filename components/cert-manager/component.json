@@ -3,7 +3,8 @@
   "description": "Deploys Cert-Manager for automated TLS certificates.",
   "dependencies": ["ingress-nginx"],
   "provisions": {
-    "install": "install.sh",
+    "install": "scripts/install.sh",
+    "configs": "scripts/configs.sh",
     "reboot_after": false
   }
 }
