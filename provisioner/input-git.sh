@@ -71,6 +71,10 @@ done
 # 6. Commit and Push the new Configuration
 echo "--> Committing auto-generated configuration to your private repository..."
 cd "$PRIVATE_CONFIG_DIR"
+# Set a temporary author identity JUST for this one commit.
+# This prevents the "Author identity unknown" error.
+git config user.name "Hyperion Engine"
+git config user.email "bot@hyperion-engine"
 git add .
 if ! git diff --staged --quiet; then
     git commit -m "feat: Auto-generate kustomization for $(hostname)"
