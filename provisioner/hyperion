@@ -1,5 +1,6 @@
 #!/bin/bash
 #
+# Hyperion
 # The Hyperion Command Line Interface
 
 
@@ -15,6 +16,13 @@ fi
 
 # Set the KUBECONFIG for all kubectl/flux commands
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+
+# --- Configuration & Constants ---
+BASE_PLATFORM_MARKER="/etc/hyperion/state/base_platform_complete.done"
+KUBE_DASHBOARD="/opt/Hyperion/provisioner/get-dashboard-token.sh"
+GIT_ENGINE="/opt/Hyperion/provisioner/input-git.sh"
+
 
 
 # --- Flag Handling ---
@@ -46,7 +54,7 @@ case "$1" in
         kubectl proxy --address='0.0.0.0' &
         # Give it a moment to start
         sleep 2
-        sudo -E bash /opt/Hyperion/provisioner/get-dashboard-token.sh
+        sudo -E bash "$KUBE_DASHBOARD"
         echo "--> Proxy started. You can now access the dashboard on your main computer at:"
         echo "    http://<ip_address>:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/"
         echo "--> To get another login token, run 'sudo /opt/Hyperion/provisioner/get-dashboard-token.sh'"
@@ -56,15 +64,13 @@ esac
 
 
 # --- Main Logic ---
-BASE_PLATFORM_MARKER="/etc/hyperion/state/base_platform_complete.done"
-
 # A) Check if the base platform is fully provisioned.
 if [ -f "$BASE_PLATFORM_MARKER" ]; then
     echo "--> Base platform is stable. Running the Git input script..."
     # B) If it is, run the script that handles custom deployments.
-    exec bash /opt/Hyperion/provisioner/input-git.sh
+    exec bash "$GIT_ENGINE"
 else
-    # If the platform is NOT complete, show the service logs.
+    # C) If the platform is NOT complete, show the service logs.
     echo "--> Base platform provisioning is still in progress."
     echo "--> Tailing live logs from the hyperion.service..."
     echo "    (Press Ctrl+C to stop watching)"
