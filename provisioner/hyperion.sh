@@ -85,4 +85,4 @@ echo "Starting in 1"
 sleep 1 
 
 echo "  ---------> Running the Engine <---------  "
-sudo bash $ENGINE_PATH $BASE_PATH
+sudo -E bash $ENGINE_PATH $BASE_PATH
