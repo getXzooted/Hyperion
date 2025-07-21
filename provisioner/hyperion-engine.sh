@@ -36,7 +36,7 @@ fi
 CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
 
-
+echo "debug passed"
 # --- Components Engine Call ---
 sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE"
 
