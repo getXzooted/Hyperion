@@ -9,7 +9,7 @@ set -e
 # --- Configuration & Constants ---
 BASE_PLATFORM_COMPLETE="/etc/hyperion/state/base_platform_complete.done"
 COMPONENTS_ENGINE="/usr/local/bin/components-engine.sh"
-CONFIG_FILE="/etc/hyperion/config/config-$(hostname).json"
+CONFIG_FILE="$1"
 STATE_DIR="/etc/hyperion/state"
 COMPONENTS_DIR="/opt/Hyperion/components"
 UNATTENDED_REBOOT=false
