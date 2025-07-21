@@ -38,7 +38,7 @@ if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then 
 
 
 # --- Components Engine Call ---
-sudo -E bash "$COMPONENTS_ENGINE"
+sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE"
 
 # --- Reboot Logic ---
 if [ "$NEEDS_REBOOT" = "true" ]; then
