@@ -85,4 +85,5 @@ echo "Starting in 1"
 sleep 1 
 
 echo "  ---------> Running the Engine <---------  "
+echo $CONFIG_FILE
 sudo -E bash $ENGINE_PATH $CONFIG_FILE
