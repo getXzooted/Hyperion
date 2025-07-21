@@ -10,7 +10,7 @@ set -e
 
 # --- Configuration & Constants ---
 CONFIG_FILE="$1"
-
+COMPONENTS_DIR="/opt/Hyperion/components"
 
 # --- Main Component Engine Logic ---
 
