@@ -23,7 +23,7 @@ log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') - WARN: $1"; }
 ensure_state_dir() { if [ ! -d "$STATE_DIR" ]; then mkdir -p "$STATE_DIR"; fi; }
 check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
 mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
-
+export -f log_info log_error log_warn ensure_state_dir check_task_done mark_task_done
 
 # --- Main Engine Logic ---
 log_info "--- Hyperion Provisioning Engine Started ---"
