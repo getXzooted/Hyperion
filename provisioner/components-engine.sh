@@ -12,6 +12,16 @@ set -e
 CONFIG_FILE="$1"
 COMPONENTS_DIR="/opt/Hyperion/components"
 
+
+# --- Logging & State Functions (collapsed for brevity) ---
+log_info() { echo "$(date '+%Y-%m-%d %H:%M:%S') - INFO: $1"; }
+log_error() { echo >&2 "$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $1"; }
+log_warn() { echo "$(date '+%Y-%m-%d %H:%M:%S') - WARN: $1"; }
+ensure_state_dir() { if [ ! -d "$STATE_DIR" ]; then mkdir -p "$STATE_DIR"; fi; }
+check_task_done() { [ -f "${STATE_DIR}/$1.done" ]; }
+mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR}/$1.done"; }
+
+
 # --- Main Component Engine Logic ---
 
 # Read the base config for a stable k3s environment
