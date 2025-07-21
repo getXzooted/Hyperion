@@ -29,7 +29,10 @@ mark_task_done() { log_info "Marking task '$1' as complete."; touch "${STATE_DIR
 log_info "--- Hyperion Provisioning Engine Started ---"
 if [ "$1" == "-y" ]; then UNATTENDED_REBOOT=true; fi
 ensure_state_dir
-if [ ! -f "$CONFIG_FILE" ]; then log_error "Config not found: ${CONFIG_FILE}"; exit 1; fi
+if [ -z "$CONFIG_FILE" ] || [ ! -f "$CONFIG_FILE" ]; then
+    log_error "Engine started without a valid config file. Path provided: '${CONFIG_FILE}'"
+    exit 1
+fi
 CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
 
