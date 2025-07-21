@@ -8,6 +8,10 @@
 set -e
 
 
+# --- Configuration & Constants ---
+CONFIG_FILE="$1"
+
+
 # --- Main Component Engine Logic ---
 
 # Read the base config for a stable k3s environment
