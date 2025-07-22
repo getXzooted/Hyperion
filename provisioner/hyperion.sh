@@ -38,11 +38,11 @@ git clone "$REPO_URL" "$REPO_DIR"
 
 
 echo "  ---------> Setting up the Hyperion provisioning service <---------  "
-cp "${REPO_DIR}/provisioner/component-configs.sh" "$CONFIG_PATH"
-cp "${REPO_DIR}/provisioner/components-engine.sh" "$COMPONENTS_ENGINE"
-cp "${REPO_DIR}/provisioner/hyperion-engine.sh" "$ENGINE_PATH"
-cp "${REPO_DIR}/provisioner/hyperion.service" "$SERVICE_PATH"
-cp "${REPO_DIR}/provisioner/hyperion" "$COMMAND_PATH"
+cp "${REPO_DIR}/provisioner/component-configs.sh" "$CONFIG_PATH" && \
+cp "${REPO_DIR}/provisioner/components-engine.sh" "$COMPONENTS_ENGINE" && \
+cp "${REPO_DIR}/provisioner/hyperion-engine.sh" "$ENGINE_PATH" && \
+cp "${REPO_DIR}/provisioner/hyperion.service" "$SERVICE_PATH" && \
+cp "${REPO_DIR}/provisioner/hyperion" "$COMMAND_PATH" && \
 cp "$BASE_PATH" "$CONFIG_FILE"
 chmod +x "${REPO_DIR}/provisioner/get-dashboard-token.sh"
 chmod +x "$COMPONENTS_ENGINE"
