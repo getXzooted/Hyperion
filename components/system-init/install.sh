@@ -16,7 +16,7 @@ br_netfilter
 EOF
 
 # Load the module for the current session
-modprobe br_netfilter
+/sbin/modprobe br_netfilter
 
 # Ensure required bridge-netfilter settings are enabled in the kernel
 cat <<EOF | tee /etc/sysctl.d/99-k3s.conf
@@ -26,7 +26,7 @@ net.bridge.bridge-nf-call-arptables = 1
 EOF
 
 # Apply the new sysctl settings for the current session
-sysctl --system
+/sbin/sysctl --system
 
 echo "  ---------> Kernel networking settings applied."
 
