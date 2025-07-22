@@ -39,7 +39,7 @@ apt-get update
 
 echo "  ---------> Upgrading existing packages <---------  "
 apt-get install --fix-broken -y
-apt-get upgrade -y
+DEBIAN_FRONTEND=noninteractive apt-get upgrade -y -o Dpkg::Options::="--force-confnew"
 echo "  ---------> Update and Upgrade complete. <---------  "
 
 
