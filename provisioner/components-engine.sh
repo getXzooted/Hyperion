@@ -69,14 +69,12 @@ while true; do
                     UNATTENDED_REBOOT=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
                     if [ "$UNATTENDED_REBOOT" = true ]; then
                         log_warn "--> Task '${COMPONENT_NAME}' requires reboot. Rebooting automatically..."
-                        sleep 10
-                        sudo reboot
                     else
                         log_warn "--> ACTION REQUIRED: Task '${COMPONENT_NAME}' requires a reboot."
                         sudo systemctl stop hyperion.service # Stop cleanly
                     fi
                     # Exit the engine immediately since a reboot is pending.
-                    exit 0
+                    exit 10
                 else
                     # Case 3: The script failed with a different error (e.g., exit code 1).
                     log_error "Task '${COMPONENT_NAME}' failed with a fatal error (Exit Code: ${TASK_EXIT_CODE})."
