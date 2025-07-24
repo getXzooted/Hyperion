@@ -40,7 +40,7 @@ if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then 
 sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE"
 
 # --- Reboot Logic ---
-if [ "$NEEDS_REBOOT" = "true" ]; then
+if [[ "$TASK_EXIT_CODE" -eq 10 ]]; then
    if [ "$UNATTENDED_REBOOT" = true ]; then
       echo "--> Provisioner has requested a reboot. REBOOTING NOW..."
       sleep 5
