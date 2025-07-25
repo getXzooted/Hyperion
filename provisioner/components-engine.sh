@@ -57,7 +57,7 @@ while true; do
                 log_info "--> Provisioning component: ${COMPONENT_NAME}"
                 INSTALL_SCRIPT=$(jq -r '.provisions.install' "$MANIFEST_FILE")
 
-                sudo bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
+                sudo -E bash "${COMPONENTS_DIR}/${COMPONENT_NAME}/${INSTALL_SCRIPT}" || TASK_EXIT_CODE=$?
                 
                 # ONLY if the task succeeded, mark it as done and record progress
                 if [[ -z "$TASK_EXIT_CODE" || "$TASK_EXIT_CODE" -eq 0 ]]; then
