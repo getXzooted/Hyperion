@@ -37,7 +37,7 @@ CONFIG_REBOOT_POLICY=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
 if [ "$UNATTENDED_REBOOT" = false ] && [ "$CONFIG_REBOOT_POLICY" = true ]; then UNATTENDED_REBOOT=true; fi
 
 # --- Components Engine Call ---
-sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE"
+sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE" || TASK_EXIT_CODE=$?
 
 # --- Reboot Logic ---
 if [[ "$TASK_EXIT_CODE" -eq 10 ]]; then
