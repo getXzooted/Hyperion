@@ -13,7 +13,7 @@ CONFIG_FILE="$1"
 STATE_DIR="/etc/hyperion/state"
 COMPONENTS_DIR="/opt/Hyperion/components"
 UNATTENDED_REBOOT=false
-export NEEDS_REBOOT="false"
+NEEDS_REBOOT="false"
 
 
 # --- Logging & State Functions (collapsed for brevity) ---
@@ -41,30 +41,32 @@ sudo -E bash "$COMPONENTS_ENGINE" "$CONFIG_FILE"
 
 # --- Reboot Logic ---
 if [[ "$TASK_EXIT_CODE" -eq 10 ]]; then
-   if [ "$UNATTENDED_REBOOT" = true ]; then
-      echo "--> Provisioner has requested a reboot. REBOOTING NOW..."
-      echo "5"
-      sleep 1
-      echo "4"
-      sleep 1
-      echo "3"
-      sleep 1
-      echo "2"
-      sleep 1
-      echo "1"
-      sleep 1
-      reboot
-      exit 0
-   else
-       log_warn "--------------------------------------------------------"
-       log_warn "          ACTION REQUIRED: A reboot is needed.          "
-       log_warn "            Please run 'sudo reboot' now.               "
-       log_warn "            The provisioning service will               "
-       log_warn "          continue automatically after reboot.          "
-       log_warn "--------------------------------------------------------"
-   fi
+    UNATTENDED_REBOOT=$(jq -r '.parameters.reboot_unattended' "$CONFIG_FILE")
+    if [ "$UNATTENDED_REBOOT" = true ]; then
+        echo "--> Provisioner has requested a reboot. REBOOTING NOW..."
+        echo "5"
+        sleep 1
+        echo "4"
+        sleep 1
+        echo "3"
+        sleep 1
+        echo "2"
+        sleep 1
+        echo "1"
+        sleep 1
+        reboot
+    else
+        log_warn "--------------------------------------------------------"
+        log_warn "          ACTION REQUIRED: A reboot is needed.          "
+        log_warn "            Please run 'sudo reboot' now.               "
+        log_warn "            The provisioning service will               "
+        log_warn "          continue automatically after reboot.          "
+        log_warn "--------------------------------------------------------"
+    fi
+    exit 10
 else
     log_info "--- BASE PROVISIONING COMPLETE YOU CAN NOW MOVE TO DEPLOYMENT ---"
     log_info "--- USE SUDO HYPERION TO PROMPT GIT INPUT FOR PRIVATE CONFIGS ---"
     touch "$BASE_PLATFORM_COMPLETE"
+    exit 0
 fi
