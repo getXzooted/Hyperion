@@ -52,11 +52,11 @@ spec:
   interval: 5m
   chart:
     spec:
-      # This tells Flux to get the chart from our public repo
-      chart: /opt/Hyperion/charts/pi-hole
+      chart: pi-hole
+      version: "2.17.0" # Pinning to a specific version for stability is best practice
       sourceRef:
-        kind: GitRepository
-        name: flux-system # This should match the name of the main GitRepository object
+        kind: HelmRepository
+        name: pi-hole       # This now points to the HelmRepository object
         namespace: flux-system
   # This is where we inject the user's parameters from their JSON file
   values:
