@@ -43,7 +43,7 @@ EOF
 
 # 2. Create the HelmRelease object to deploy the chart with our custom values
 cat <<EOF | kubectl apply -f -
-apiVersion: helm.toolkit.fluxcd.io/v2
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: pi-hole
@@ -52,11 +52,11 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: pi-hole
-      version: "2.17.0" # Pin to a specific version for stability
+      # This tells Flux to get the chart from our public repo
+      chart: /opt/Hyperion/charts/pi-hole
       sourceRef:
-        kind: HelmRepository
-        name: pi-hole
+        kind: GitRepository
+        name: flux-system # This should match the name of the main GitRepository object
         namespace: flux-system
   # This is where we inject the user's parameters from their JSON file
   values:
