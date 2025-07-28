@@ -1,4 +1,3 @@
-#!/bin/bash
 #
 # Hyperion
 # The Hyperion Command Line Interface
@@ -22,14 +21,13 @@ export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 BASE_PLATFORM_MARKER="/etc/hyperion/state/base_platform_complete.done"
 KUBE_DASHBOARD="/opt/Hyperion/provisioner/get-dashboard-token.sh"
 GIT_ENGINE="/opt/Hyperion/provisioner/input-git.sh"
-
+LOG_COLLECTOR_ENGINE="/opt/Hyperion/provisioner/engines/logs-engine.sh"
 
 
 # --- Flag Handling ---
 case "$1" in
 
     --logs-full)
-        LOG_COLLECTOR_ENGINE="/opt/Hyperion/provisioner/engines/log-collector.sh"
         FILENAME="$2"
         SAVE_PATH=""
         LOG_MODE="append" # Default to appending (cache mode)
