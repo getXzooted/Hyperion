@@ -27,6 +27,36 @@ GIT_ENGINE="/opt/Hyperion/provisioner/input-git.sh"
 
 # --- Flag Handling ---
 case "$1" in
+
+    --logs-full)
+        LOG_COLLECTOR_ENGINE="/opt/Hyperion/provisioner/engines/log-collector.sh"
+        FILENAME="$2"
+        SAVE_PATH=""
+        LOG_MODE="append" # Default to appending (cache mode)
+
+        # This is a robust way to parse multiple optional flags
+        shift 2 # Move past '--logs-full' and the filename
+        while (( "$#" )); do
+        case "$1" in
+            --save-external)
+            SAVE_PATH="$2"
+            shift 2
+            ;;
+            --new)
+            LOG_MODE="new"
+            shift
+            ;;
+            *) # Break on any unknown flag
+            break
+            ;;
+        esac
+        done
+
+        # Call the log collector engine with the parsed arguments
+        sudo -E bash "$LOG_COLLECTOR_ENGINE" "$FILENAME" "$SAVE_PATH" "$LOG_MODE"
+        exit 0
+        ;;
+
     --dns)
         echo "--> Querying for Pi-hole DNS service IP..."
         # This command gets the service and uses a jsonpath to extract only the IP.
